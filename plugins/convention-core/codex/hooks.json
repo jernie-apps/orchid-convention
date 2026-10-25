@@ -1,0 +1,17 @@
+{
+  "$comment": "Template for a repository's .codex/hooks.json. /convention-setup (or a person) replaces __ORCHID_CORE__ with the absolute path of an installed convention-core. Every layer calls the same hook.sh as Claude Code, with --host codex. The event names, matcher syntax and output contract are assumptions recorded in README.md; they are not verified against a live Codex.",
+  "hooks": {
+    "SessionStart": [
+      {"hooks": [{"type": "command", "command": "\"__ORCHID_CORE__/scripts/hook.sh\" baseline --host codex", "timeout": 20}]}
+    ],
+    "PreToolUse": [
+      {"matcher": "apply_patch|Edit|Write", "hooks": [{"type": "command", "command": "\"__ORCHID_CORE__/scripts/hook.sh\" guard --host codex", "timeout": 15}]}
+    ],
+    "PostToolUse": [
+      {"matcher": "apply_patch|Edit|Write", "hooks": [{"type": "command", "command": "\"__ORCHID_CORE__/scripts/hook.sh\" lint --host codex", "timeout": 60}]}
+    ],
+    "Stop": [
+      {"hooks": [{"type": "command", "command": "\"__ORCHID_CORE__/scripts/hook.sh\" gate --host codex", "timeout": 30}]}
+    ]
+  }
+}

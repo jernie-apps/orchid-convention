@@ -198,9 +198,7 @@ def render_claude(blocks, warns, notes, max_strike, nonneg):
 
 
 def main(argv) -> int:
-    host = "claude"
-    if argv[:1] == ["--host"] and len(argv) > 1:
-        host = argv[1]
+    host = oc.host_arg(argv)
     try:
         payload = json.loads(sys.stdin.read() or "{}")
         if not isinstance(payload, dict):
@@ -208,15 +206,9 @@ def main(argv) -> int:
         event = oc.normalize(payload)
         result = decide(event)
     except Exception as e:  # noqa: BLE001 - a crash must be reported, never read as a pass
-        oc.emit({"systemMessage": f"Orchid convention guard failed ({type(e).__name__}: {e}); "
-                                  "this write was NOT checked."})
-        return 0
-    if host != "claude":
-        oc.emit({"systemMessage": f"Orchid convention guard has no output adapter for host '{host}'; "
-                                  "this write was NOT checked."})
-        return 0
-    oc.emit(render_claude(*result[:5]))
-    return 0
+        return oc.respond(host, "guard", {"systemMessage": f"Orchid convention guard failed "
+                                          f"({type(e).__name__}: {e}); this write was NOT checked."})
+    return oc.respond(host, "guard", render_claude(*result[:5]))
 
 
 if __name__ == "__main__":

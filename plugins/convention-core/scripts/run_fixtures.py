@@ -4,8 +4,9 @@
 Usage: run_fixtures.py [<pack-dir> ...]     (default: every plugins/convention-*/pack.json)
 
 Each case in fixtures/<id>.cases is sent to `hook.sh guard` twice: as a
-Claude Code Write/Edit payload and as a Codex apply_patch payload. Both must
-give the same verdict:
+Claude Code Write/Edit payload with --host claude, and as a Codex apply_patch
+payload with --host codex (whose exit status and stderr are mapped back).
+Both must give the same verdict:
 
   good   no denial, no prompt, no rule mentioned, no engine note.
   bad    exactly the guarded rules in '#> expect' are reported (none missing,
@@ -63,12 +64,27 @@ def payload(shape: str, case: dict, cwd: str, session: str) -> dict:
             "tool_name": "apply_patch", "tool_input": {"command": ["apply_patch", patch]}}
 
 
-def call(layer: str, data: dict, env: dict) -> dict:
-    proc = subprocess.run([BASH, str(HOOK), layer], input=json.dumps(data), capture_output=True,
+def call(layer: str, data: dict, env: dict, host: str = "claude") -> dict:
+    """Run one layer and return its result in Claude Code's output shape.
+
+    A Codex run (--host codex) is mapped back: exit status 2 with stderr is a
+    denial, a stdout systemMessage is context, unless it is an engine note.
+    """
+    proc = subprocess.run([BASH, str(HOOK), layer, "--host", host], input=json.dumps(data), capture_output=True,
                           text=True, env=env, timeout=60)
+    out = proc.stdout.strip()
+    if host == "codex":
+        if proc.returncode == 2:
+            return {"hookSpecificOutput": {"permissionDecision": "deny",
+                                           "permissionDecisionReason": proc.stderr}}
+        if proc.returncode != 0:
+            raise RuntimeError(f"hook.sh {layer} exited {proc.returncode}: {proc.stderr.strip()}")
+        msg = json.loads(out).get("systemMessage", "") if out else ""
+        if "could not check" in msg or "did NOT run" in msg or "failed" in msg:
+            return {"systemMessage": msg}
+        return {"hookSpecificOutput": {"additionalContext": msg}} if msg else {}
     if proc.returncode != 0:
         raise RuntimeError(f"hook.sh {layer} exited {proc.returncode}: {proc.stderr.strip()}")
-    out = proc.stdout.strip()
     return json.loads(out) if out else {}
 
 
@@ -101,7 +117,7 @@ class Runner:
                         repo = work / f"r{n}"
                         repo.mkdir()
                         env["ORCHID_STATE_DIR"] = str(work / f"s{n}")
-                        out = call("guard", payload(shape, case, os.path.realpath(repo), f"fx{n}"), env)
+                        out = call("guard", payload(shape, case, os.path.realpath(repo), f"fx{n}"), env, shape)
                         self.check(f"{f.name}:{case['line']} [{shape}] {case['kind']}: {case['title']}",
                                    case, rules, out)
             self.check_lint(pack, pack_dir, files, work, env)

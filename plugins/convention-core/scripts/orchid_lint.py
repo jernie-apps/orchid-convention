@@ -131,24 +131,16 @@ def render_claude(findings, notes):
 
 
 def main(argv) -> int:
-    host = "claude"
-    if argv[:1] == ["--host"] and len(argv) > 1:
-        host = argv[1]
+    host = oc.host_arg(argv)
     try:
         payload = json.loads(sys.stdin.read() or "{}")
         if not isinstance(payload, dict):
             raise ValueError("payload is not an object")
         findings, notes = run(oc.normalize(payload))
     except Exception as e:  # noqa: BLE001 - a crash must be reported, never read as a pass
-        oc.emit({"systemMessage": f"Orchid convention lint failed ({type(e).__name__}: {e}); "
-                                  "the file was NOT linted."})
-        return 0
-    if host != "claude":
-        oc.emit({"systemMessage": f"Orchid convention lint has no output adapter for host '{host}'; "
-                                  "the file was NOT linted."})
-        return 0
-    oc.emit(render_claude(findings, notes))
-    return 0
+        return oc.respond(host, "lint", {"systemMessage": f"Orchid convention lint failed "
+                                         f"({type(e).__name__}: {e}); the file was NOT linted."})
+    return oc.respond(host, "lint", render_claude(findings, notes))
 
 
 if __name__ == "__main__":

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # hook.sh - single entry point for every convention-core hook.
 #
-# Usage: hook.sh <guard|lint|gate|baseline> [--host claude]
+# Usage: hook.sh <guard|lint|gate|baseline> [--host claude|codex]
 #
 # Reads the host's hook payload on stdin and hands it to the matching Python
 # layer. Kept to bash 3.2 (macOS) and POSIX tools. When the layer cannot run
@@ -13,7 +13,7 @@ case "$layer" in
   guard|lint) script="orchid_$layer.py"; shift ;;
   gate|baseline) script="orchid_gate.py" ;;
   *)
-    echo "usage: hook.sh <guard|lint|gate|baseline> [--host claude]" >&2
+    echo "usage: hook.sh <guard|lint|gate|baseline> [--host claude|codex]" >&2
     exit 2
     ;;
 esac

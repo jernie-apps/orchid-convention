@@ -16,6 +16,7 @@ import json
 import os
 import re
 import subprocess
+import sys
 import time
 from pathlib import Path
 
@@ -368,3 +369,53 @@ def _prune(data: dict, keep: int = 32):
 def emit(obj: dict):
     if obj:
         print(json.dumps(obj))
+
+
+# ----------------------------------------------------------------- output
+
+HOSTS = ("claude", "codex")
+
+CODEX_ASK = ("The convention guard would ask a human here (repeated attempts at the same rule), but this "
+             "Codex hook cannot prompt, so the write is denied. Stop retrying: tell the user which rule "
+             "blocks this and why, and let them decide. They can switch an overridable rule off for this repo "
+             "in .orchid/conventions/<stack>.md with 'override: global' and a 'reason:'.\n\n")
+
+
+def respond(host: str, event: str, out: dict) -> int:
+    """Write a layer's result for the host and return the process exit status.
+
+    Every layer builds its result in Claude Code's hook output shape. For Claude
+    that object is printed as is. For Codex it is translated under the
+    assumptions in docs (codex/README.md): a blocking result is the reason on
+    stderr with exit status 2, and anything informational is a systemMessage
+    on stdout with exit status 0. There is no prompt: 'ask' becomes a denial
+    that tells the agent to hand the decision to the user.
+    """
+    if host == "claude":
+        emit(out)
+        return 0
+    if host != "codex":
+        emit({"systemMessage": f"Orchid convention has no output adapter for host '{host}'; "
+                               f"the {event} layer did NOT run."})
+        return 0
+    hso = out.get("hookSpecificOutput", {})
+    info = [x for x in (out.get("systemMessage"), hso.get("additionalContext")) if x]
+    decision = hso.get("permissionDecision")
+    reason = hso.get("permissionDecisionReason") or ""
+    if decision == "ask":
+        reason = CODEX_ASK + reason
+    if out.get("decision") == "block":
+        decision, reason = "block", out.get("reason", "")
+    if decision in ("deny", "ask", "block"):
+        sys.stderr.write("\n\n".join([reason] + info) + "\n")
+        return 2
+    if info:
+        emit({"systemMessage": "\n\n".join(dict.fromkeys(info))})
+    return 0
+
+
+def host_arg(argv) -> str:
+    for i, a in enumerate(argv):
+        if a == "--host" and i + 1 < len(argv):
+            return argv[i + 1]
+    return "claude"
