@@ -61,7 +61,7 @@ let apiKey = "sk_live_123"
 
 ## Hooks
 
-Both layers go through one entry point, `scripts/hook.sh <guard|lint>`, registered in [`hooks/hooks.json`](hooks/hooks.json) for `Edit|Write|MultiEdit`. The scripts accept a Claude Code payload (`Write` content, `Edit` new text, `MultiEdit` edits) or a Codex payload (an `apply_patch` body anywhere in `tool_input`, one file or many), and map both onto the same checks. Only Claude Code output is rendered so far; Codex output is the next adapter.
+Both layers go through one entry point, `scripts/hook.sh <guard|lint>`, registered in [`hooks/hooks.json`](hooks/hooks.json) for `Edit|Write|MultiEdit`. The scripts accept a Claude Code payload (`Write` content, `Edit` new text, `MultiEdit` edits) or a Codex payload (an `apply_patch` body anywhere in `tool_input`, one file or many), and map both onto the same checks. Output is rendered for the host named by `--host` (default `claude`). For Codex, [`codex/hooks.json`](codex/hooks.json) is a `.codex/hooks.json` template calling the same layers with `--host codex`. A blocking result becomes the reason on stderr with exit status 2, and information becomes a `systemMessage`. There is no `ask`: the third attempt becomes a denial that tells the agent to hand the decision to the user. These Codex output conventions are assumptions, listed in [`codex/README.md`](codex/README.md), and are not verified against a live Codex.
 
 Packs are discovered, not configured: `ORCHID_PACKS` (a path list) if set, otherwise sibling `convention-*` directories of this plugin (a checkout), otherwise the plugin cache layout `<marketplace>/<plugin>/<version>/`, newest version first. A file belongs to every pack whose `files` globs match its repo-relative path and whose `exclude` globs do not.
 
@@ -114,7 +114,7 @@ Strike counts, once-per-session notices, degraded-capability notes, session base
 python3 plugins/convention-core/scripts/run_fixtures.py [<pack-dir> ...]
 ```
 
-Replays every `.cases` fixture through the real `hook.sh guard`, once as a Claude Code payload and once as a Codex `apply_patch` payload, and asserts the verdict: good cases pass silently; bad cases report exactly the guarded rules they expect, deny when one blocks, and list non-overridable rules first. Expected rules that `guard.json` does not hold (lint or scanner rules) must get no guard output and are listed as not asserted. It then drives the lint layer once per pack and checks that a missing linter is reported once with the pack's message.
+Replays every `.cases` fixture through the real `hook.sh guard`, once as a Claude Code payload (`--host claude`) and once as a Codex `apply_patch` payload (`--host codex`), and asserts the verdict: good cases pass silently; bad cases report exactly the guarded rules they expect, deny when one blocks, and list non-overridable rules first. Expected rules that `guard.json` does not hold (lint or scanner rules) must get no guard output and are listed as not asserted. It then drives the lint layer once per pack and checks that a missing linter is reported once with the pack's message.
 
 ## Measuring the scanner
 
@@ -150,4 +150,4 @@ Only rules with `overridable: true` can be switched off this way.
 
 ## Status
 
-Schema, validator, guard engine, lint dispatcher, fixture runner, scan gate and scanner. The Codex output adapter and the setup skill are not built yet. The hook contract is exercised with simulated payloads only; no live Claude Code or Codex session has run these hooks.
+Schema, validator, guard engine, lint dispatcher, fixture runner, scan gate, scanner and the Codex adapter. The setup skill is not built yet. The hook contract is exercised with simulated payloads only; no live Claude Code or Codex session has run these hooks.

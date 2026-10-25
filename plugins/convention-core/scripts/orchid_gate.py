@@ -175,7 +175,7 @@ def gate(payload) -> dict:
 
 def main(argv) -> int:
     layer = argv[0] if argv else "gate"
-    host = argv[2] if argv[1:2] == ["--host"] and len(argv) > 2 else "claude"
+    host = oc.host_arg(argv)
     try:
         payload = json.loads(sys.stdin.read() or "{}")
         if not isinstance(payload, dict):
@@ -190,15 +190,9 @@ def main(argv) -> int:
             return 0
         result = gate(payload)
     except Exception as e:  # noqa: BLE001 - a crash must be reported, never read as a pass
-        oc.emit({"systemMessage": f"Orchid convention gate failed ({type(e).__name__}: {e}); "
-                                  "this turn ends unscanned."})
-        return 0
-    if host != "claude":
-        oc.emit({"systemMessage": f"Orchid convention gate has no output adapter for host '{host}'; "
-                                  "this turn ends unscanned."})
-        return 0
-    oc.emit(result)
-    return 0
+        return oc.respond(host, "gate", {"systemMessage": f"Orchid convention gate failed "
+                                         f"({type(e).__name__}: {e}); this turn ends unscanned."})
+    return oc.respond(host, "gate", result)
 
 
 if __name__ == "__main__":
