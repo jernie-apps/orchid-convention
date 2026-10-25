@@ -81,9 +81,32 @@ For each written file, every covering pack's `guard.json` rules whose `file_glob
 
 For each written file, each covering pack's `lint` command runs on the whole file with a timeout. Output or a non-zero exit goes back to the agent as a `block` reason (the write already happened; this makes the agent address it). A missing linter, or a pack with `"lint": null`, is reported once per session to both the agent and the human as "lint did NOT run", and a note is left for the gate to surface. A timeout is reported as unfinished, not as clean.
 
+### Gate (`SessionStart`, `Stop`, `SubagentStop`)
+
+At session start, `hook.sh baseline` records `HEAD` and the files already dirty. At every stop, `hook.sh gate` computes the change set with `scripts/orchid_scan.py`: every file that differs from the baseline commit (committed, staged, unstaged or untracked), minus files that were dirty at session start and unchanged since, narrowed to paths an installed pack covers. Its content hash is what a scan seals.
+
+| State of the change set | Gate |
+| --- | --- |
+| empty | passes silently |
+| sealed `clean` | passes silently |
+| sealed `standing` (a full-repo rule broken in a file this change does not touch) | passes, says so once |
+| sealed `violations` | blocks with the list |
+| unsealed, scan in progress for this hash | passes silently |
+| unsealed | blocks with the exact scan commands |
+
+A block repeats at most twice per change-set hash. On the third stop the turn ends, the human is told once that the change leaves unscanned (or with violations), and the exit is appended to `exits.jsonl` in state. Degraded-capability notes, such as a missing linter, are surfaced once per session at stop. A missing baseline is reported, not silently treated as "no changes".
+
+Subagents are gated only when their type matches the `gated_agents` plugin option (a regular expression; `*` for all). The scanner itself is never gated.
+
+### Scanner
+
+The [`scanner`](agents/scanner.md) agent and the [`convention-detect`](skills/convention-detect/SKILL.md) skill share one procedure: `begin`, `rules` (the model and lint rules to judge, per changed file), `sweep` (every regex rule over the change set, plus full-repo regex rules over every tracked file), read and judge, write a findings file outside the work tree, then `seal --findings <file>`. The scanner never edits code and never chooses the verdict: `seal` validates the findings, merges the sweep, and derives `violations`, `standing` or `clean`. A sweep hit in a changed file makes the verdict `violations` whatever the scanner claimed.
+
+Buckets: `violation`, `standing`, `advisory`, `unknown-pattern`, `inconsistent`. For `inconsistent` the scanner describes both sides and never picks a winner.
+
 ### State
 
-Strike counts, once-per-session notices and degraded-capability notes live in the repository's git dir (`.git/orchid-convention/`, or the worktree's git dir), so they never appear in `git status` and never get committed. `ORCHID_STATE_DIR` overrides the location. Outside a git repository there is no state: denials never escalate and notices repeat, and the guard says so.
+Strike counts, once-per-session notices, degraded-capability notes, session baselines, seals and recorded exits live in the repository's git dir (`.git/orchid-convention/`, or the worktree's git dir), so they never appear in `git status` and never get committed. `ORCHID_STATE_DIR` overrides the location. Outside a git repository there is no state: denials never escalate and notices repeat, and the guard says so.
 
 ## Fixture suites
 
@@ -115,4 +138,4 @@ Only rules with `overridable: true` can be switched off this way.
 
 ## Status
 
-Schema, validator, guard engine, lint dispatcher and fixture runner. The scan gate (`Stop`/`SubagentStop`), the Codex output adapter and the setup skill are not built yet. The hook contract is exercised with simulated payloads only; no live Claude Code or Codex session has run these hooks.
+Schema, validator, guard engine, lint dispatcher, fixture runner, scan gate and scanner. The Codex output adapter and the setup skill are not built yet. The hook contract is exercised with simulated payloads only; no live Claude Code or Codex session has run these hooks.

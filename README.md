@@ -4,7 +4,7 @@ Enforces a project's coding conventions while an agent writes code, in Claude Co
 
 | Plugin | What it holds |
 | --- | --- |
-| [`convention-core`](plugins/convention-core/README.md) | The rule schema, the validator, one guard engine, one lint dispatcher, and later the scan gate. Ships no rules. |
+| [`convention-core`](plugins/convention-core/README.md) | The rule schema, the validator, one guard engine, one lint dispatcher, the scan gate and the read-only scanner. Ships no rules. |
 | [`convention-swift`](plugins/convention-swift/README.md) | Swift 6 and SwiftUI rules, their guard patterns, fixtures and a SwiftLint config. Data only. |
 
 ## How it works
@@ -13,7 +13,7 @@ A change meets three layers in order.
 
 1. **Guard** (before a write): rules that can be decided from the new text alone are checked before the file changes. Every broken rule is reported in one denial. After two denials for the same rule on the same file, the third attempt asks the human instead. Non-overridable rules (secrets, personal data in logs) keep denying and never escalate.
 2. **Lint** (after a write): the pack's own linter runs over the whole file. If the linter is not installed, the session is told once that lint did not run. That is never reported as a pass.
-3. **Gate** (before the turn ends): rules that need the whole file or the whole repo are checked by a read-only scan, and the turn cannot end until the current diff has been scanned and sealed. Planned; see Status.
+3. **Gate** (before the turn ends): rules that need the whole file or the whole repo are checked by a read-only scan, and the turn cannot end until the current change set has been scanned and sealed. A change set that stays unscanned is blocked twice, then let through with a recorded warning.
 
 A repo can switch off an overridable rule in writing at `.orchid/conventions/<stack>.md`. Security rules cannot be switched off there.
 
@@ -43,4 +43,4 @@ CI runs all three on Linux with the oldest supported Python and on macOS with th
 
 ## Status
 
-Core guard and lint layers are built and tested with simulated Claude Code and Codex payloads; the Swift pack, the scan gate, the Codex output adapter and the setup skill follow in separate pull requests. Nothing here has been exercised against a live Claude Code or Codex session yet.
+Guard, lint and gate layers and the Swift pack are built and tested with simulated Claude Code and Codex payloads; the Codex output adapter and the setup skill follow in separate pull requests. Nothing here has been exercised against a live Claude Code or Codex session yet.
