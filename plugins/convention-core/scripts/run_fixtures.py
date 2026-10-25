@@ -124,10 +124,10 @@ class Runner:
             return
         guarded = [r for r in case["expect"] if r in rules]
         scanner = [r for r in case["expect"] if r not in rules]
-        note = f" (scanner-owned, not asserted here: {' '.join(scanner)})" if scanner else ""
+        note = f" (lint or scanner layer, not asserted here: {' '.join(scanner)})" if scanner else ""
         if not guarded:
             if out:
-                self.fail(f"{label}: guard must stay silent for scanner-owned rules", out)
+                self.fail(f"{label}: guard must stay silent for rules it does not hold", out)
             else:
                 print(f"ok: {label}: guard silent{note}")
             return

@@ -13,8 +13,13 @@ Swift 6 and SwiftUI rule pack for Orchid Convention. It is data only: [`conventi
 | [`swift-security-003`](rules/swift-security-003.md) | No personal data in logs, analytics or crash reports | scanner | **no** |
 | [`swift-structure-001`](rules/swift-structure-001.md) | A ViewModel is a class | guard | yes |
 | [`swift-structure-002`](rules/swift-structure-002.md) | A ViewModel is `@Observable`, not `ObservableObject` | guard | yes |
+| [`swift-structure-003`](rules/swift-structure-003.md) | One primary type per file, named like the file | scanner | yes |
+| [`swift-layering-002`](rules/swift-layering-002.md) | `*View.swift` files never use `URLSession` or `URLRequest` | guard | yes |
+| [`swift-concurrency-001`](rules/swift-concurrency-001.md) | No unowned `Task { }` in a view; prefer `.task { }` (warn) | guard | yes |
+| [`swift-concurrency-002`](rules/swift-concurrency-002.md) | `@unchecked Sendable` carries a same-line `// SAFETY:` justification | guard | yes |
+| [`swift-style-001`](rules/swift-style-001.md) | No force unwrapping (SwiftLint `force_unwrapping`, warn) | lint | yes |
 
-"guard" rules are fragment-safe regexes, mirrored in `guard.json` and checked before every write. "scanner" rules need the whole file and are judged by the scan gate, which is not built yet; until then they are documented and fixture-covered but not enforced.
+"guard" rules are fragment-safe regexes, mirrored in `guard.json` and checked before every write. "lint" rules run through SwiftLint after the write. "scanner" rules need the whole file and are judged by the scan gate, which is not built yet; until then they are documented and fixture-covered but not enforced.
 
 ## Lint
 

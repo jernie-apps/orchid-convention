@@ -223,7 +223,7 @@ class GuardTest(unittest.TestCase):
         run = subprocess.run([sys.executable, str(SCRIPTS / "run_fixtures.py"), str(self.pack)],
                              capture_output=True, text=True, env=self.env)
         self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
-        self.assertIn("scanner-owned, not asserted here: demo-model-001", run.stdout)
+        self.assertIn("lint or scanner layer, not asserted here: demo-model-001", run.stdout)
         self.assertIn("[codex]", run.stdout)
         self.assertIn("lint none", run.stdout)
         # A fixture that claims a rule the guard does not report must fail the run.

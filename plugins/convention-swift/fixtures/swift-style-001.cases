@@ -1,0 +1,18 @@
+#> case good: binding instead of force unwrap
+#> path: Sources/App/Config/Endpoint.swift
+import Foundation
+
+enum ConfigError: Error { case badURL(String) }
+
+func endpoint(_ raw: String) throws -> URL {
+    guard let url = URL(string: raw) else { throw ConfigError.badURL(raw) }
+    return url
+}
+#> case bad: force unwrap (lint layer, not the guard)
+#> path: Sources/App/Config/Endpoint.swift
+#> expect: swift-style-001
+import Foundation
+
+func endpoint(_ raw: String) -> URL {
+    URL(string: raw)!
+}

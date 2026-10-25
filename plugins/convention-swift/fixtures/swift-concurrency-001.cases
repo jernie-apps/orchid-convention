@@ -1,0 +1,39 @@
+#> case good: lifetime-bound .task and a stored, cancelled Task
+#> path: Sources/App/Features/Feed/FeedView.swift
+import SwiftUI
+
+struct FeedView: View {
+    @State private var viewModel = FeedViewModel()
+    @State private var refreshTask: Task<Void, Never>?
+
+    var body: some View {
+        List(viewModel.items) { FeedRow(item: $0) }
+            .task { await viewModel.load() }
+            .refreshable { refreshTask = Task { await viewModel.refresh() } }
+            .onDisappear { refreshTask?.cancel() }
+    }
+}
+#> case good: Task outside a view file is not this rule's concern
+#> path: Sources/App/Services/SyncService.swift
+func scheduleSync() {
+    Task { await sync() }
+}
+#> case bad: fire-and-forget Task in a button (warn, does not block)
+#> path: Sources/App/Features/Feed/FeedView.swift
+#> expect: swift-concurrency-001
+struct FeedView: View {
+    var body: some View {
+        Button("Reload") {
+            Task { await viewModel.load() }
+        }
+    }
+}
+#> case bad: detached Task with priority, as an edit
+#> path: Sources/App/Features/Feed/FeedView.swift
+#> tool: Edit
+#> expect: swift-concurrency-001
+        .onAppear {
+            Task.detached(priority: .background) {
+                await viewModel.prefetch()
+            }
+        }
