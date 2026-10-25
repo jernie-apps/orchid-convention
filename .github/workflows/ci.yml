@@ -1,0 +1,57 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  linux:
+    name: linux (oldest supported python)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
+      - name: Manifests parse and agree
+        run: |
+          set -eu
+          jq -e . .claude-plugin/marketplace.json >/dev/null
+          for p in $(jq -r '.plugins[].source' .claude-plugin/marketplace.json); do
+            name="$(jq -r .name "$p/.claude-plugin/plugin.json")"
+            jq -e --arg n "$name" '.plugins[] | select(.name == $n)' .claude-plugin/marketplace.json >/dev/null
+            echo "ok: $p -> $name"
+          done
+      - name: Validate rule packs
+        run: python3 plugins/convention-core/scripts/validate_rules.py
+      - name: Behaviour tests
+        run: python3 -m unittest discover -s tests -v
+      - name: Shellcheck
+        run: |
+          set -eu
+          files="$(git ls-files '*.sh')"
+          if [ -z "$files" ]; then echo "no shell scripts in this tree"; exit 0; fi
+          shellcheck --shell=bash $files
+
+  macos:
+    name: macos (system bash 3.2 and system python3)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Tool versions
+        run: |
+          /bin/bash --version | head -1
+          /usr/bin/python3 --version
+          jq --version
+      - name: Validate rule packs
+        run: /usr/bin/python3 plugins/convention-core/scripts/validate_rules.py
+      - name: Behaviour tests
+        run: /usr/bin/python3 -m unittest discover -s tests -v

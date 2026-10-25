@@ -1,0 +1,10 @@
+{
+  "name": "convention-core",
+  "version": "0.1.0",
+  "description": "Stack-agnostic convention machinery: rule schema, one guard engine driven by each pack's guard.json, a lint dispatcher driven by each pack's pack.json, and the scan gate. Install with at least one stack pack such as convention-swift.",
+  "author": {
+    "name": "companie-apps"
+  },
+  "repository": "https://github.com/companie-apps/orchid-convention",
+  "keywords": ["conventions", "code-quality", "guard", "lint"]
+}

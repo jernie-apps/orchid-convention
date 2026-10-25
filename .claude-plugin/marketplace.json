@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "orchid-convention",
+  "owner": {
+    "name": "companie-apps"
+  },
+  "description": "Enforces a project's coding conventions while an agent writes code: a stack-agnostic core plus one rule pack per language.",
+  "version": "0.1.0",
+  "plugins": [
+    {
+      "name": "convention-core",
+      "source": "./plugins/convention-core",
+      "description": "Stack-agnostic machinery: rule schema, guard engine, lint dispatcher and (later) the scan gate. Ships no rules.",
+      "category": "code-quality"
+    },
+    {
+      "name": "convention-swift",
+      "source": "./plugins/convention-swift",
+      "description": "Swift 6 and SwiftUI rule pack. Data only; requires convention-core.",
+      "category": "code-quality"
+    }
+  ]
+}

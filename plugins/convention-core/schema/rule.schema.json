@@ -1,0 +1,183 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/companie-apps/orchid-convention/plugins/convention-core/schema/rule.schema.json",
+  "title": "Orchid convention rule",
+  "description": "Frontmatter of one rule file: plugins/convention-<stack>/rules/<id>.md. A rule id is permanent. Retire a rule by moving it to state 'removed'; never delete the file or reuse the id, because overrides, strikes, findings and fixtures all key on it. validate_rules.py implements the subset of draft-07 used here and fails on any keyword it does not implement.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "stack",
+    "category",
+    "title",
+    "statement",
+    "rationale",
+    "state",
+    "overridable",
+    "ignorable",
+    "scope",
+    "severity",
+    "detect",
+    "examples",
+    "introduced"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "<stack>-<category>-<NNN>. Must equal the file name without .md.",
+      "pattern": "^[a-z][a-z0-9]*-[a-z]+-[0-9]{3}$"
+    },
+    "stack": {
+      "type": "string",
+      "description": "Stack id. Must equal the pack's pack.json stack and the convention-<stack> directory. Open set: a new pack never needs a schema change.",
+      "pattern": "^[a-z][a-z0-9]*$"
+    },
+    "category": {
+      "type": "string",
+      "enum": ["naming", "layering", "security", "structure", "concurrency", "style", "testing"]
+    },
+    "title": {
+      "type": "string",
+      "description": "One imperative line.",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "statement": {
+      "type": "string",
+      "description": "The rule as one or more complete sentences.",
+      "minLength": 1
+    },
+    "rationale": {
+      "type": "string",
+      "description": "Why the rule exists. Overrides and retirement are argued against this text.",
+      "minLength": 1
+    },
+    "state": {
+      "type": "string",
+      "enum": ["proposed", "advisory", "active", "deprecated", "removed"],
+      "description": "Only an active rule can block. Advisory and deprecated rules report without blocking; proposed and removed rules are inert."
+    },
+    "advisory_until": {
+      "type": "string",
+      "format": "date",
+      "description": "Required for state 'advisory': the date its evidence is reviewed."
+    },
+    "overridable": {
+      "type": "boolean",
+      "description": "Whether a repo may switch the rule off in .orchid/conventions/<stack>.md. False is reserved for a short list (secrets, PII in logs). A false rule also never escalates to a human prompt in the guard."
+    },
+    "ignorable": {
+      "type": "boolean",
+      "description": "Whether an inline ignore marker is honoured. Must be false when overridable is false."
+    },
+    "scope": {
+      "type": "string",
+      "enum": ["changed-files", "full-repo"],
+      "description": "changed-files: only the current change set is judged. full-repo: every file, every scan. Non-overridable rules must be full-repo."
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["block", "warn", "info"]
+    },
+    "detect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["method", "file_glob", "fragment_safe"],
+      "properties": {
+        "method": {
+          "type": "string",
+          "enum": ["regex", "lint", "model"],
+          "description": "regex: line-based POSIX ERE run through grep -E. lint: the pack linter's own rule. model: a whole-file judgement by the scanner."
+        },
+        "pattern": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Portable POSIX ERE, matched per line. No \\s, \\w, \\d, \\b or (?...): BSD and GNU grep disagree on them."
+        },
+        "flags": {
+          "type": "string",
+          "pattern": "^i?$",
+          "description": "'i' for case-insensitive. Matching is always per line."
+        },
+        "file_glob": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Repo-relative glob. '**/' matches zero or more directories, '*' and '?' never cross '/'."
+        },
+        "exclude_glob": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Repo-relative glob of files the rule never applies to, such as test doubles."
+        },
+        "exclude_pattern": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Portable POSIX ERE. A matching line is not reported even when it matches pattern. Keep it narrow: it hides real hits as easily as false ones."
+        },
+        "fragment_safe": {
+          "type": "boolean",
+          "description": "True only when the rule can be decided from the new text of an edit alone. Only fragment-safe regex rules may appear in guard.json, and every one of them must."
+        },
+        "lint_rule_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The linter's identifier for the rule, when method is 'lint'."
+        }
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"method": {"const": "regex"}}},
+          "then": {"required": ["pattern"]}
+        },
+        {
+          "if": {"properties": {"method": {"const": "lint"}}},
+          "then": {"required": ["lint_rule_id"], "properties": {"fragment_safe": {"const": false}}}
+        },
+        {
+          "if": {"properties": {"method": {"const": "model"}}},
+          "then": {"properties": {"fragment_safe": {"const": false}}}
+        }
+      ]
+    },
+    "examples": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["good", "bad"],
+      "properties": {
+        "good": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+        "bad": {"type": "array", "items": {"type": "string"}, "minItems": 1}
+      }
+    },
+    "fix": {
+      "type": "string",
+      "minLength": 1,
+      "description": "One-line remediation shown with a finding."
+    },
+    "introduced": {
+      "type": "string",
+      "format": "date"
+    },
+    "supersedes": {
+      "type": "array",
+      "items": {"type": "string", "pattern": "^[a-z][a-z0-9]*-[a-z]+-[0-9]{3}$"}
+    },
+    "superseded_by": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*-[a-z]+-[0-9]{3}$"
+    },
+    "tags": {
+      "type": "array",
+      "items": {"type": "string"}
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"state": {"const": "advisory"}}},
+      "then": {"required": ["advisory_until"]}
+    },
+    {
+      "if": {"properties": {"overridable": {"const": false}}},
+      "then": {"properties": {"ignorable": {"const": false}, "scope": {"const": "full-repo"}}}
+    }
+  ]
+}
