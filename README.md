@@ -36,10 +36,11 @@ A stack pack does nothing on its own: core's engine reads it.
 ```bash
 python3 plugins/convention-core/scripts/validate_rules.py   # schema and pack invariants
 python3 -m unittest discover -s tests -v                     # behaviour tests
+python3 plugins/convention-core/scripts/run_fixtures.py      # every pack's fixtures through the real hook
 ```
 
-CI runs both on Linux with the oldest supported Python and on macOS with the system bash and Python. Repository rules are in [`AGENTS.md`](AGENTS.md).
+CI runs all three on Linux with the oldest supported Python and on macOS with the system bash and Python. Repository rules are in [`AGENTS.md`](AGENTS.md).
 
 ## Status
 
-Scaffolding: marketplace, manifests, rule schema and validator. The guard engine, lint dispatcher and the Swift pack follow in separate pull requests. Nothing here has been exercised against a live Claude Code or Codex session yet.
+Core guard and lint layers are built and tested with simulated Claude Code and Codex payloads; the Swift pack, the scan gate, the Codex output adapter and the setup skill follow in separate pull requests. Nothing here has been exercised against a live Claude Code or Codex session yet.

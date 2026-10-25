@@ -32,6 +32,10 @@ jobs:
         run: python3 plugins/convention-core/scripts/validate_rules.py
       - name: Behaviour tests
         run: python3 -m unittest discover -s tests -v
+        env:
+          ORCHID_PYTHON: python3
+      - name: Pack fixture suites (Claude and Codex payloads)
+        run: python3 plugins/convention-core/scripts/run_fixtures.py
       - name: Shellcheck
         run: |
           set -eu
@@ -55,3 +59,10 @@ jobs:
         run: /usr/bin/python3 plugins/convention-core/scripts/validate_rules.py
       - name: Behaviour tests
         run: /usr/bin/python3 -m unittest discover -s tests -v
+        env:
+          ORCHID_TEST_BASH: /bin/bash
+      - name: Pack fixture suites (Claude and Codex payloads)
+        run: /usr/bin/python3 plugins/convention-core/scripts/run_fixtures.py
+        env:
+          ORCHID_TEST_BASH: /bin/bash
+          ORCHID_PYTHON: /usr/bin/python3

@@ -59,6 +59,40 @@ let apiKey = "sk_live_123"
 
 `path` is repo-relative and must satisfy the rule's glob. `expect` lists every rule the case breaks. `tool: Edit` replays the case as an edit fragment instead of a whole-file write.
 
+## Hooks
+
+Both layers go through one entry point, `scripts/hook.sh <guard|lint>`, registered in [`hooks/hooks.json`](hooks/hooks.json) for `Edit|Write|MultiEdit`. The scripts accept a Claude Code payload (`Write` content, `Edit` new text, `MultiEdit` edits) or a Codex payload (an `apply_patch` body anywhere in `tool_input`, one file or many), and map both onto the same checks. Only Claude Code output is rendered so far; Codex output is the next adapter.
+
+Packs are discovered, not configured: `ORCHID_PACKS` (a path list) if set, otherwise sibling `convention-*` directories of this plugin (a checkout), otherwise the plugin cache layout `<marketplace>/<plugin>/<version>/`, newest version first. A file belongs to every pack whose `files` globs match its repo-relative path and whose `exclude` globs do not.
+
+### Guard (`PreToolUse`)
+
+For each written file, every covering pack's `guard.json` rules whose `file_glob` matches are run over the new text with `grep -E`, per line, minus lines matching `exclude_pattern`. Then:
+
+- all broken rules are reported in one denial, non-overridable ones first, with line numbers (`line` for a whole write, `inserted line` for an edit or patch hunk);
+- strikes are counted per session, file and rule; the third attempt at the same rule on the same file returns `ask` instead of `deny`;
+- any non-overridable hit denies, whatever the count;
+- a write with no blocking hit clears that file's strikes;
+- warn-severity hits are returned as context without a decision;
+- an overridable rule switched off in `.orchid/conventions/<stack>.md` (with a reason) is skipped; an attempt to switch off a non-overridable rule is refused and named in the denial;
+- a pattern grep rejects, a malformed `guard.json` entry, a crash, or a missing `python3` is reported in `systemMessage` as not checked.
+
+### Lint (`PostToolUse`)
+
+For each written file, each covering pack's `lint` command runs on the whole file with a timeout. Output or a non-zero exit goes back to the agent as a `block` reason (the write already happened; this makes the agent address it). A missing linter, or a pack with `"lint": null`, is reported once per session to both the agent and the human as "lint did NOT run", and a note is left for the gate to surface. A timeout is reported as unfinished, not as clean.
+
+### State
+
+Strike counts, once-per-session notices and degraded-capability notes live in the repository's git dir (`.git/orchid-convention/`, or the worktree's git dir), so they never appear in `git status` and never get committed. `ORCHID_STATE_DIR` overrides the location. Outside a git repository there is no state: denials never escalate and notices repeat, and the guard says so.
+
+## Fixture suites
+
+```bash
+python3 plugins/convention-core/scripts/run_fixtures.py [<pack-dir> ...]
+```
+
+Replays every `.cases` fixture through the real `hook.sh guard`, once as a Claude Code payload and once as a Codex `apply_patch` payload, and asserts the verdict: good cases pass silently; bad cases report exactly the guarded rules they expect, deny when one blocks, and list non-overridable rules first. Expected rules that only the scanner can judge are listed as not asserted. It then drives the lint layer once per pack and checks that a missing linter is reported once with the pack's message.
+
 ## Validation
 
 ```bash
@@ -81,4 +115,4 @@ Only rules with `overridable: true` can be switched off this way.
 
 ## Status
 
-Schema and validator only. The guard engine and lint dispatcher arrive in the next pull request, and the scan gate after that.
+Schema, validator, guard engine, lint dispatcher and fixture runner. The scan gate (`Stop`/`SubagentStop`), the Codex output adapter and the setup skill are not built yet. The hook contract is exercised with simulated payloads only; no live Claude Code or Codex session has run these hooks.

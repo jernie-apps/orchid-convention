@@ -1,0 +1,29 @@
+{
+  "description": "Orchid convention core. Guard: before Edit, Write or MultiEdit, deny fragment-safe rule violations from every installed pack's guard.json. Lint: after the write, run each covering pack's declared linter on the whole file. Both find packs by their pack.json file globs, so one registration serves every stack.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/scripts/hook.sh guard",
+            "timeout": 15
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/scripts/hook.sh lint",
+            "timeout": 60
+          }
+        ]
+      }
+    ]
+  }
+}
