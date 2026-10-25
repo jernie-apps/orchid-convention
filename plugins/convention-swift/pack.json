@@ -1,0 +1,13 @@
+{
+  "$comment": "convention-swift pack manifest, read by convention-core's guard engine and lint dispatcher.",
+  "stack": "swift",
+  "files": ["**/*.swift"],
+  "exclude": ["**/.build/**", "**/Pods/**", "**/Carthage/**", "**/DerivedData/**"],
+  "lint": {
+    "tool": "swiftlint",
+    "args": ["lint", "--quiet", "{config_args}", "{file}"],
+    "config": {"file": ".swiftlint.yml", "args": ["--config", "{config}"]},
+    "missing": "swiftlint is not on PATH. Install it with `brew install swiftlint`; the next Swift write is then linted.",
+    "timeout": 45
+  }
+}

@@ -1,0 +1,32 @@
+#> case good: Domain uses Foundation only
+#> path: Sources/App/Domain/Order/OrderTotal.swift
+import Foundation
+
+struct OrderTotal: Equatable, Sendable {
+    let amount: Decimal
+    let currency: String
+}
+#> case good: SwiftUI is fine outside Domain
+#> path: Sources/App/Features/Order/OrderTotalView.swift
+import SwiftUI
+
+struct OrderTotalView: View {
+    let total: OrderTotal
+    var body: some View { Text(total.amount, format: .currency(code: total.currency)) }
+}
+#> case bad: SwiftUI imported into Domain
+#> path: Sources/App/Domain/Order/OrderTotal.swift
+#> expect: swift-layering-001
+import SwiftUI
+
+struct OrderTotal {
+    let amount: Decimal
+    let tint: Color
+}
+#> case bad: attributed and scoped imports, directly under Domain
+#> path: Domain/Customer.swift
+#> expect: swift-layering-001
+@preconcurrency import UIKit
+import struct SwiftUI.Color
+
+struct Customer {}

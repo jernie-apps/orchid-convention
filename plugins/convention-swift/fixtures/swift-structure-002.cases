@@ -1,0 +1,24 @@
+#> case good: Observable ViewModel; a non-ViewModel store may stay ObservableObject
+#> path: Sources/App/Features/Cart/CartViewModel.swift
+import Observation
+
+@MainActor
+@Observable
+final class CartViewModel {
+    var items: [CartItem] = []
+}
+
+final class LegacyCartStore: ObservableObject {}
+#> case bad: ObservableObject ViewModel with Published
+#> path: Sources/App/Features/Cart/CartViewModel.swift
+#> expect: swift-structure-002
+import Combine
+
+@MainActor
+final class CartViewModel: NSObject, ObservableObject {
+    @Published var items: [CartItem] = []
+}
+#> case bad: conformance added in an extension
+#> path: Sources/App/Features/Cart/CartViewModel+Observable.swift
+#> expect: swift-structure-002
+extension CartViewModel: ObservableObject {}

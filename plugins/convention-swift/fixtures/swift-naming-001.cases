@@ -1,0 +1,32 @@
+#> case good: protocol named for its role
+#> path: Sources/App/Data/UserStore.swift
+import Foundation
+
+protocol UserStore: Sendable {
+    func user(id: User.ID) async throws -> User
+}
+
+final class RemoteUserStore: UserStore {
+    func user(id: User.ID) async throws -> User { try await client.fetch(id) }
+}
+#> case good: acronym after I is not an interface prefix
+#> path: Sources/App/Net/IPAddressConvertible.swift
+protocol IPAddressConvertible {
+    var ipAddress: String { get }
+}
+#> case good: commented-out legacy name
+#> path: Sources/App/Data/UserStore.swift
+// Was: protocol IUserStore, renamed in 2026.
+protocol UserStore {}
+#> case bad: interface prefix
+#> path: Sources/App/Data/IUserStore.swift
+#> expect: swift-naming-001
+protocol IUserStore {
+    func user(id: User.ID) async throws -> User
+}
+#> case bad: Protocol suffix with attributes, as an edit
+#> path: Sources/App/Data/UserStore.swift
+#> tool: Edit
+#> expect: swift-naming-001
+public protocol UserStoreProtocol: Sendable {
+}
