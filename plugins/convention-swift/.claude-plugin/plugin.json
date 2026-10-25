@@ -1,0 +1,10 @@
+{
+  "name": "convention-swift",
+  "version": "0.1.0",
+  "description": "Swift 6 and SwiftUI convention rules, guard patterns and SwiftLint config. Data only: convention-core's engine enforces it.",
+  "author": {
+    "name": "companie-apps"
+  },
+  "repository": "https://github.com/companie-apps/orchid-convention",
+  "keywords": ["swift", "swiftui", "conventions", "code-quality"]
+}
