@@ -1,0 +1,28 @@
+# Bundled fallback config for convention-swift's lint layer.
+# A repo's own .swiftlint.yml, found by searching upward from the linted file
+# to the repo root, always wins over this one.
+#
+# Only long-standing SwiftLint rules are listed: an unknown identifier makes
+# SwiftLint print a warning on every run, which the lint layer would report
+# after every write.
+
+opt_in_rules:
+  - force_unwrapping            # swift-style-001
+  - implicitly_unwrapped_optional
+  - empty_count
+  - first_where
+  - contains_over_first_not_nil
+  - fatal_error_message
+
+disabled_rules:
+  - todo
+
+excluded:
+  - .build
+  - Pods
+  - Carthage
+  - DerivedData
+
+line_length:
+  warning: 160
+  error: 200

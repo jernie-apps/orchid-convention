@@ -1,7 +1,40 @@
 # convention-swift
 
-Swift 6 and SwiftUI rule pack for Orchid Convention. It is data only: [`convention-core`](../convention-core/README.md) reads its `pack.json`, `guard.json` and rules, so install core alongside it.
+Swift 6 and SwiftUI rule pack for Orchid Convention. It is data only: [`convention-core`](../convention-core/README.md) reads `pack.json`, `guard.json` and `rules/`, so install core alongside it.
 
-## Status
+## Rules
 
-Placeholder. The rules, guard patterns, fixtures and SwiftLint configuration arrive in a later pull request.
+| Id | Rule | Detected by | Repo can override |
+| --- | --- | --- | --- |
+| [`swift-naming-001`](rules/swift-naming-001.md) | Protocols take no I- prefix or -Protocol suffix | guard | yes |
+| [`swift-layering-001`](rules/swift-layering-001.md) | Domain/ never imports SwiftUI, UIKit, AppKit or WatchKit | guard | yes |
+| [`swift-security-001`](rules/swift-security-001.md) | No hardcoded secret literals | guard | **no** |
+| [`swift-security-002`](rules/swift-security-002.md) | No personal-data field interpolated into a log call | guard | **no** |
+| [`swift-security-003`](rules/swift-security-003.md) | No personal data in logs, analytics or crash reports | scanner | **no** |
+| [`swift-structure-001`](rules/swift-structure-001.md) | A ViewModel is a class | guard | yes |
+| [`swift-structure-002`](rules/swift-structure-002.md) | A ViewModel is `@Observable`, not `ObservableObject` | guard | yes |
+
+"guard" rules are fragment-safe regexes, mirrored in `guard.json` and checked before every write. "scanner" rules need the whole file and are judged by the scan gate, which is not built yet; until then they are documented and fixture-covered but not enforced.
+
+## Lint
+
+`pack.json` declares `swiftlint lint --quiet [--config <file>] <file>`. The repo's own `.swiftlint.yml`, found upward from the written file, wins over the bundled [`.swiftlint.yml`](.swiftlint.yml). Without `swiftlint` on `PATH`, the session is told once that Swift lint did not run.
+
+## Overrides
+
+A repo switches off an overridable rule in `.orchid/conventions/swift.md`:
+
+```markdown
+## swift-structure-002
+override: global
+reason: The app still supports iOS 16, where @Observable is unavailable.
+```
+
+The security rules ignore such a block, and the guard says so when it fires.
+
+## Adding or changing a rule
+
+1. Add `rules/swift-<category>-<NNN>.md` with a new id. Never reuse or delete an id; retire it with `state: removed`.
+2. If it is a fragment-safe regex, mirror it into `guard.json` with a message. Patterns are portable POSIX ERE matched per line: no `\s`, `\w`, `\d`, `\b` or `(?`.
+3. Add `fixtures/<id>.cases` with at least one good case and one bad case that expects it. Bad cases list every rule they break.
+4. Run `python3 plugins/convention-core/scripts/validate_rules.py` and `python3 plugins/convention-core/scripts/run_fixtures.py plugins/convention-swift`.

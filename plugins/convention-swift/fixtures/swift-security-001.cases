@@ -1,0 +1,45 @@
+#> case good: key read from configuration and Keychain
+#> path: Sources/App/Config/APIConfig.swift
+import Foundation
+
+struct APIConfig {
+    let apiKey = Bundle.main.object(forInfoDictionaryKey: "API_KEY") as? String
+    let token = try? Keychain.read(.authToken)
+
+    func isMissing() -> Bool { token == "" }
+}
+#> case good: enum raw value and commented example
+#> path: Sources/App/Validation/Pattern.swift
+enum Pattern: String {
+    case password = "^.{8,}$"
+}
+// let apiKey = "sk_live_example"
+#> case good: fake credential in a test double
+#> path: Tests/AppTests/Mocks/MockSession.swift
+struct MockSession {
+    static let authToken = "fake-token"
+}
+#> case bad: literal API key
+#> path: Sources/App/Config/APIConfig.swift
+#> expect: swift-security-001
+struct APIConfig {
+    let apiKey = "sk_live_51H8xQ"
+}
+#> case bad: typed static token and client secret, not a Mock directory
+#> path: Sources/App/Auth/MockableAuth.swift
+#> expect: swift-security-001
+enum Credentials {
+    static let authToken: String = "eyJhbGciOiJIUzI1NiJ9"
+    private static let clientSecret = "s3cr3t"
+}
+#> case bad: cascade, every guarded rule in one write, non-overridable first
+#> path: Sources/App/Domain/Login/LoginViewModel.swift
+#> expect: swift-security-001 swift-security-002 swift-layering-001 swift-naming-001 swift-structure-001 swift-security-003
+import SwiftUI
+
+protocol ILoginService {}
+
+struct LoginViewModel {
+    let password = "hunter22"
+    func log(_ user: User) { print("login \(user.email)") }
+}

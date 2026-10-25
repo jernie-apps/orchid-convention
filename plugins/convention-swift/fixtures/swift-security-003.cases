@@ -1,0 +1,20 @@
+#> case good: analytics with an order id only
+#> path: Sources/App/Checkout/CheckoutTracker.swift
+struct CheckoutTracker {
+    func completed(_ order: Order) {
+        analytics.track(.checkoutCompleted, properties: ["orderId": order.id.uuidString])
+        logger.debug("Recipient set for order \(order.id)")
+    }
+}
+#> case bad: concatenated name and street reach print (scanner only)
+#> path: Sources/App/Shipping/ShippingNotifier.swift
+#> expect: swift-security-003
+func notify(_ order: Order) {
+    print("Shipping to " + order.recipient.name + ", " + order.recipient.street)
+}
+#> case bad: home address set as a crash-report key (scanner only)
+#> path: Sources/App/Diagnostics/CrashContext.swift
+#> expect: swift-security-003
+func attach(_ customer: Customer) {
+    Crashlytics.crashlytics().setCustomValue(customer.homeAddress, forKey: "addr")
+}

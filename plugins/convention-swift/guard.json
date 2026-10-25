@@ -1,0 +1,62 @@
+{
+  "$comment": "Fragment-safe regex subset of rules/*.md for convention-core's guard engine. validate_rules.py fails if any entry drifts from its rule file or any fragment-safe regex rule is missing.",
+  "stack": "swift",
+  "rules": [
+    {
+      "id": "swift-layering-001",
+      "pattern": "^[[:space:]]*(@[A-Za-z_]+[[:space:]]+)*import[[:space:]]+((typealias|struct|class|enum|protocol|let|var|func)[[:space:]]+)?(SwiftUI|UIKit|AppKit|WatchKit)([^A-Za-z0-9_]|$)",
+      "file_glob": "**/Domain/**/*.swift",
+      "severity": "block",
+      "overridable": true,
+      "message": "Files under Domain/ must not import SwiftUI, UIKit, AppKit or WatchKit. Move the UI-dependent code to the presentation layer."
+    },
+    {
+      "id": "swift-naming-001",
+      "pattern": "(^|[^A-Za-z0-9_])protocol[[:space:]]+(I[A-Z][a-z][A-Za-z0-9_]*|[A-Za-z0-9_]+Protocol)([^A-Za-z0-9_]|$)",
+      "file_glob": "**/*.swift",
+      "exclude_pattern": "^[[:space:]]*//",
+      "severity": "block",
+      "overridable": true,
+      "message": "Protocol names take no I- prefix or -Protocol suffix. Name the protocol for its role (UserStore) and the concrete type for how it works (RemoteUserStore)."
+    },
+    {
+      "id": "swift-security-001",
+      "pattern": "[A-Za-z0-9_]*(api_?key|secret|token|password|passwd)[[:space:]]*(:[[:space:]]*String[[:space:]]*)?=[[:space:]]*\"[^\"]+\"",
+      "flags": "i",
+      "file_glob": "**/*.swift",
+      "exclude_glob": "**/{Mock,Mocks}/**",
+      "exclude_pattern": "^[[:space:]]*//|(^|[^A-Za-z0-9_])case[[:space:]]",
+      "severity": "block",
+      "overridable": false,
+      "message": "Hardcoded secret literal. Read it from the Keychain, an uncommitted build configuration or a secrets service, and rotate it if it was ever committed. Non-overridable."
+    },
+    {
+      "id": "swift-security-002",
+      "pattern": "(print|debugPrint|NSLog|os_log|\\.(trace|debug|info|notice|log|warning|error|critical|fault))[[:space:]]*\\(.*\\\\\\([^)]*(email|emailAddress|phoneNumber|mobileNumber|fullName|firstName|lastName|dateOfBirth|birthDate|ssn|socialSecurityNumber|nationalId|passportNumber|creditCardNumber|cardNumber)[[:space:]]*[,)]",
+      "flags": "i",
+      "file_glob": "**/*.swift",
+      "exclude_pattern": "^[[:space:]]*//|privacy:[[:space:]]*\\.(private|sensitive)",
+      "severity": "block",
+      "overridable": false,
+      "message": "Personal-data field interpolated into a log call. Log a non-personal id instead, or redact with os.Logger privacy: .private. Non-overridable."
+    },
+    {
+      "id": "swift-structure-001",
+      "pattern": "(^|[^A-Za-z0-9_])(struct|enum)[[:space:]]+[A-Za-z0-9_]*ViewModel([^A-Za-z0-9_]|$)",
+      "file_glob": "**/*.swift",
+      "exclude_pattern": "^[[:space:]]*//",
+      "severity": "block",
+      "overridable": true,
+      "message": "A ViewModel must be a class, not a struct or enum: a copied value type stops view updates silently. Use @Observable final class."
+    },
+    {
+      "id": "swift-structure-002",
+      "pattern": "(^|[^A-Za-z0-9_])(class|extension)[[:space:]]+[A-Za-z0-9_]*ViewModel[^{]*:[^{]*ObservableObject([^A-Za-z0-9_]|$)",
+      "file_glob": "**/*.swift",
+      "exclude_pattern": "^[[:space:]]*//",
+      "severity": "block",
+      "overridable": true,
+      "message": "ViewModels use @Observable, not ObservableObject. Replace the conformance with the @Observable macro and drop @Published."
+    }
+  ]
+}
