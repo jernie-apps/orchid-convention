@@ -3,12 +3,39 @@
   "stack": "swift",
   "rules": [
     {
+      "id": "swift-concurrency-001",
+      "pattern": "(^|[^A-Za-z0-9_.])Task(\\.detached)?[[:space:]]*(\\([^)]*\\))?[[:space:]]*\\{",
+      "file_glob": "**/*View.swift",
+      "exclude_pattern": "^[[:space:]]*//|=[[:space:]]*Task",
+      "severity": "warn",
+      "overridable": true,
+      "message": "Unowned Task in a View: it is not cancelled when the view goes away. Prefer the .task { } modifier, or store the Task and cancel it in onDisappear."
+    },
+    {
+      "id": "swift-concurrency-002",
+      "pattern": "@unchecked[[:space:]]+Sendable",
+      "file_glob": "**/*.swift",
+      "exclude_pattern": "^[[:space:]]*//|//[[:space:]]*SAFETY:[[:space:]]*[^[:space:]]",
+      "severity": "block",
+      "overridable": true,
+      "message": "@unchecked Sendable needs a same-line justification: // SAFETY: <how the state is protected>. Prefer an actor, a Mutex or a value type."
+    },
+    {
       "id": "swift-layering-001",
       "pattern": "^[[:space:]]*(@[A-Za-z_]+[[:space:]]+)*import[[:space:]]+((typealias|struct|class|enum|protocol|let|var|func)[[:space:]]+)?(SwiftUI|UIKit|AppKit|WatchKit)([^A-Za-z0-9_]|$)",
       "file_glob": "**/Domain/**/*.swift",
       "severity": "block",
       "overridable": true,
       "message": "Files under Domain/ must not import SwiftUI, UIKit, AppKit or WatchKit. Move the UI-dependent code to the presentation layer."
+    },
+    {
+      "id": "swift-layering-002",
+      "pattern": "(^|[^A-Za-z0-9_])(URLSession|URLRequest)([^A-Za-z0-9_]|$)",
+      "file_glob": "**/*View.swift",
+      "exclude_pattern": "^[[:space:]]*//",
+      "severity": "block",
+      "overridable": true,
+      "message": "Views must not do networking. Move URLSession or URLRequest work to a service the ViewModel calls."
     },
     {
       "id": "swift-naming-001",

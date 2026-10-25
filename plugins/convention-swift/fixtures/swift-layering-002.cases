@@ -1,0 +1,39 @@
+#> case good: view delegates loading to its ViewModel
+#> path: Sources/App/Features/Orders/OrderListView.swift
+import SwiftUI
+
+struct OrderListView: View {
+    @State private var viewModel = OrderListViewModel()
+
+    var body: some View {
+        List(viewModel.orders) { OrderRow(order: $0) }
+            .task { await viewModel.load() }
+    }
+}
+#> case good: services may use URLSession
+#> path: Sources/App/Services/OrderService.swift
+struct OrderService {
+    func fetch() async throws -> [Order] {
+        let (data, _) = try await URLSession.shared.data(from: endpoint)
+        return try JSONDecoder().decode([Order].self, from: data)
+    }
+}
+#> case bad: view builds a request and fetches
+#> path: Sources/App/Features/Orders/OrderListView.swift
+#> expect: swift-layering-002
+import SwiftUI
+
+struct OrderListView: View {
+    @State private var orders: [Order] = []
+
+    var body: some View {
+        List(orders) { OrderRow(order: $0) }
+            .task {
+                var request = URLRequest(url: endpoint)
+                request.httpMethod = "GET"
+                if let (data, _) = try? await URLSession.shared.data(for: request) {
+                    orders = (try? JSONDecoder().decode([Order].self, from: data)) ?? []
+                }
+            }
+    }
+}

@@ -91,7 +91,7 @@ Strike counts, once-per-session notices and degraded-capability notes live in th
 python3 plugins/convention-core/scripts/run_fixtures.py [<pack-dir> ...]
 ```
 
-Replays every `.cases` fixture through the real `hook.sh guard`, once as a Claude Code payload and once as a Codex `apply_patch` payload, and asserts the verdict: good cases pass silently; bad cases report exactly the guarded rules they expect, deny when one blocks, and list non-overridable rules first. Expected rules that only the scanner can judge are listed as not asserted. It then drives the lint layer once per pack and checks that a missing linter is reported once with the pack's message.
+Replays every `.cases` fixture through the real `hook.sh guard`, once as a Claude Code payload and once as a Codex `apply_patch` payload, and asserts the verdict: good cases pass silently; bad cases report exactly the guarded rules they expect, deny when one blocks, and list non-overridable rules first. Expected rules that `guard.json` does not hold (lint or scanner rules) must get no guard output and are listed as not asserted. It then drives the lint layer once per pack and checks that a missing linter is reported once with the pack's message.
 
 ## Validation
 

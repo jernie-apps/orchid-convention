@@ -1,0 +1,25 @@
+#> case good: one primary type plus a private helper
+#> path: Sources/App/Services/OrderService.swift
+import Foundation
+
+final class OrderService {
+    func fetch() async throws -> [Order] { try await client.get(Endpoint.orders) }
+}
+
+private enum Endpoint {
+    static let orders = "/orders"
+}
+#> case bad: second public type in the file (scanner only)
+#> path: Sources/App/Services/OrderService.swift
+#> expect: swift-structure-003
+final class OrderService {}
+
+struct OrderCache {
+    var orders: [Order] = []
+}
+#> case bad: file not named after its type (scanner only)
+#> path: Sources/App/Support/Helpers.swift
+#> expect: swift-structure-003
+struct DateFormatting {
+    static let short = Date.FormatStyle(date: .abbreviated, time: .omitted)
+}

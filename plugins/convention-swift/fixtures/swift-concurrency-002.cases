@@ -1,0 +1,23 @@
+#> case good: justified exception and an actor
+#> path: Sources/App/Cache/ImageCache.swift
+import Foundation
+
+final class ImageCache: @unchecked Sendable { // SAFETY: every access goes through lock
+    private let lock = NSLock()
+    private var storage: [URL: Data] = [:]
+}
+
+actor ThumbnailCache {
+    private var storage: [URL: Data] = [:]
+}
+#> case bad: unjustified unchecked conformance
+#> path: Sources/App/Cache/ImageCache.swift
+#> expect: swift-concurrency-002
+final class ImageCache: @unchecked Sendable {
+    private var storage: [URL: Data] = [:]
+}
+#> case bad: justification on the line above is not seen
+#> path: Sources/App/Legacy/LegacyBridge.swift
+#> expect: swift-concurrency-002
+// SAFETY: only touched on the main thread
+extension LegacyBridge: @unchecked Sendable {}
