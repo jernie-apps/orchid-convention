@@ -6,5 +6,18 @@
     "name": "companie-apps"
   },
   "repository": "https://github.com/companie-apps/orchid-convention",
-  "keywords": ["conventions", "code-quality", "guard", "lint"]
+  "keywords": [
+    "conventions",
+    "code-quality",
+    "guard",
+    "lint"
+  ],
+  "userConfig": {
+    "gated_agents": {
+      "type": "string",
+      "title": "Gated subagent types",
+      "description": "Regular expression matched against a subagent's type at SubagentStop. Matching subagents cannot hand back an unscanned change. Empty (default) gates no subagent; '*' gates all except the convention scanner. The main thread is always gated at Stop.",
+      "default": ""
+    }
+  }
 }

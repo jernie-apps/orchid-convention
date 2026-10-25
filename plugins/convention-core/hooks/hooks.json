@@ -1,5 +1,5 @@
 {
-  "description": "Orchid convention core. Guard: before Edit, Write or MultiEdit, deny fragment-safe rule violations from every installed pack's guard.json. Lint: after the write, run each covering pack's declared linter on the whole file. Both find packs by their pack.json file globs, so one registration serves every stack.",
+  "description": "Orchid convention core. Guard: before Edit, Write or MultiEdit, deny fragment-safe rule violations from every installed pack's guard.json. Lint: after the write, run each covering pack's declared linter on the whole file. Baseline: at session start, record the repo state the gate measures changes against. Gate: at Stop (and SubagentStop for agent types matched by the gated_agents option), block until the current change set is scanned and sealed. All layers find packs by their pack.json file globs, so one registration serves every stack.",
   "hooks": {
     "PreToolUse": [
       {
@@ -21,6 +21,39 @@
             "type": "command",
             "command": "\"${CLAUDE_PLUGIN_ROOT}\"/scripts/hook.sh lint",
             "timeout": 60
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/scripts/hook.sh baseline",
+            "timeout": 20
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/scripts/hook.sh gate",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/scripts/hook.sh gate",
+            "timeout": 30
           }
         ]
       }
