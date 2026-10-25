@@ -21,6 +21,10 @@ Swift 6 and SwiftUI rule pack for Orchid Convention. It is data only: [`conventi
 
 "guard" rules are fragment-safe regexes, mirrored in `guard.json` and checked before every write. "lint" rules run through SwiftLint after the write. "scanner" rules need the whole file and are judged by the scan gate, which is not built yet; until then they are documented and fixture-covered but not enforced.
 
+## Scan corpus
+
+[`scan-corpus/`](scan-corpus) is the answer key for scanner runs: five files with nine required planted violations (six found by the regex sweep, three only by reading) and trap lines that must not be reported (an enum raw value, a commented-out key, a redacted email). CI checks the sweep half; the judged half is measured by hand with `score_findings.py` (see the core README).
+
 ## Lint
 
 `pack.json` declares `swiftlint lint --quiet [--config <file>] <file>`. The repo's own `.swiftlint.yml`, found upward from the written file, wins over the bundled [`.swiftlint.yml`](.swiftlint.yml). Without `swiftlint` on `PATH`, the session is told once that Swift lint did not run.

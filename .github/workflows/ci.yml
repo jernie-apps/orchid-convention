@@ -36,6 +36,13 @@ jobs:
           ORCHID_PYTHON: python3
       - name: Pack fixture suites (Claude and Codex payloads)
         run: python3 plugins/convention-core/scripts/run_fixtures.py
+      - name: Scan corpus answer key (deterministic sweep)
+        run: |
+          set -eu
+          for c in plugins/convention-*/scan-corpus; do
+            [ -f "$c/truth.tsv" ] || continue
+            python3 plugins/convention-core/scripts/score_findings.py sweep "$c"
+          done
       - name: Shellcheck
         run: |
           set -eu

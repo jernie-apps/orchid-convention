@@ -1,0 +1,11 @@
+rule	file	line	layer	required
+swift-structure-002	Sources/Shop/Features/Checkout/CheckoutViewModel.swift	6	sweep	yes
+swift-style-001	Sources/Shop/Features/Checkout/CheckoutViewModel.swift	11	judged	yes
+swift-security-002	Sources/Shop/Features/Checkout/CheckoutViewModel.swift	13	sweep	yes
+swift-security-003	Sources/Shop/Features/Checkout/CheckoutViewModel.swift	13	judged	no
+swift-concurrency-002	Sources/Shop/Services/ReceiptMailer.swift	3	sweep	yes
+swift-security-003	Sources/Shop/Services/ReceiptMailer.swift	8	judged	yes
+swift-structure-003	Sources/Shop/Services/ReceiptMailer.swift	12	judged	yes
+swift-layering-001	Sources/Shop/Domain/Pricing/PriceRule.swift	2	sweep	yes
+swift-concurrency-001	Sources/Shop/Features/Banner/PromoBannerView.swift	9	sweep	yes
+swift-layering-002	Sources/Shop/Features/Banner/PromoBannerView.swift	10	sweep	yes

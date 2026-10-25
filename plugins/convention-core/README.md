@@ -116,6 +116,18 @@ python3 plugins/convention-core/scripts/run_fixtures.py [<pack-dir> ...]
 
 Replays every `.cases` fixture through the real `hook.sh guard`, once as a Claude Code payload and once as a Codex `apply_patch` payload, and asserts the verdict: good cases pass silently; bad cases report exactly the guarded rules they expect, deny when one blocks, and list non-overridable rules first. Expected rules that `guard.json` does not hold (lint or scanner rules) must get no guard output and are listed as not asserted. It then drives the lint layer once per pack and checks that a missing linter is reported once with the pack's message.
 
+## Measuring the scanner
+
+A pack may ship `scan-corpus/`: source files with planted violations and traps, plus `truth.tsv` (`rule`, `file`, `line`, `layer` = `sweep` or `judged`, `required` = `yes` or `no`). `scripts/score_findings.py` uses it in three ways:
+
+```bash
+score_findings.py sweep plugins/convention-swift/scan-corpus      # CI: the regex half, deterministic
+score_findings.py prepare plugins/convention-swift/scan-corpus /tmp/corpus-repo
+score_findings.py score plugins/convention-swift/scan-corpus/truth.tsv run1.json run2.json run3.json
+```
+
+`sweep` requires every planted regex violation and no hit on the traps. For the judged half, `prepare` builds a repository without the answer key (its session `corpus` sees the whole corpus as the change set). Then run the scanner there several times, independently, with `orchid_scan.py --session corpus`, keeping `truth.tsv` out of its reach. `score` reports each run's recall and false positives, and how many runs found each row. The number is an upper bound: the corpus was written to contain examples of its rules. Rerun it after any rule change.
+
 ## Validation
 
 ```bash
