@@ -116,6 +116,16 @@ python3 plugins/convention-core/scripts/run_fixtures.py [<pack-dir> ...]
 
 Replays every `.cases` fixture through the real `hook.sh guard`, once as a Claude Code payload (`--host claude`) and once as a Codex `apply_patch` payload (`--host codex`), and asserts the verdict: good cases pass silently; bad cases report exactly the guarded rules they expect, deny when one blocks, and list non-overridable rules first. Expected rules that `guard.json` does not hold (lint or scanner rules) must get no guard output and are listed as not asserted. It then drives the lint layer once per pack and checks that a missing linter is reported once with the pack's message.
 
+## Setup, overrides and health
+
+| Entry point | What it does |
+| --- | --- |
+| [`convention-setup`](skills/convention-setup/SKILL.md) skill | Detects covering packs, surveys the repo (sweep plus a read of sample files), reports what agrees, deviates and contradicts itself without picking a winner, asks, then writes only what was approved. |
+| [`/convention-override <rule-id> <reason>`](commands/convention-override.md) | Records `override: global` with the reason and date. Refuses non-overridable rules and empty reasons. Applies from the next check, not retroactively. |
+| [`/convention-health`](commands/convention-health.md) | Rules per layer, active and refused overrides, guard strikes per rule, gate seals and exits, degraded checks. Read-only. |
+
+All three call `scripts/orchid_setup.py` (`detect`, `init --stacks <s,...> [--codex]`, `override`, `health`). `init` is idempotent. It creates missing `.orchid/conventions/<stack>.md` files, writes or refreshes one marker block in `AGENTS.md` (following a `CLAUDE.md` symlink, or using `CLAUDE.md` when it is the only instructions file), and with `--codex` installs `.codex/hooks.json` from the template. An existing Codex file is merged, not replaced. Hook state stays in the git dir, so setup adds nothing to `.gitignore`.
+
 ## Measuring the scanner
 
 A pack may ship `scan-corpus/`: source files with planted violations and traps, plus `truth.tsv` (`rule`, `file`, `line`, `layer` = `sweep` or `judged`, `required` = `yes` or `no`). `scripts/score_findings.py` uses it in three ways:
@@ -150,4 +160,4 @@ Only rules with `overridable: true` can be switched off this way.
 
 ## Status
 
-Schema, validator, guard engine, lint dispatcher, fixture runner, scan gate, scanner and the Codex adapter. The setup skill is not built yet. The hook contract is exercised with simulated payloads only; no live Claude Code or Codex session has run these hooks.
+Schema, validator, guard engine, lint dispatcher, fixture runner, scan gate, scanner, Codex adapter, and setup, override and health. The hook contract is exercised with simulated payloads only; no live Claude Code or Codex session has run these hooks.

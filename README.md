@@ -27,6 +27,10 @@ A repo can switch off an overridable rule in writing at `.orchid/conventions/<st
 
 A stack pack does nothing on its own: core's engine reads it.
 
+## Set up a repository
+
+Inside the repository, run the `convention-setup` skill (ask for "convention setup"). It finds which packs cover the code, surveys what the code actually does, shows what agrees, deviates and contradicts itself, and **asks before writing**. Then it writes `.orchid/conventions/<stack>.md`, a marker block in `AGENTS.md`, and optionally `.codex/hooks.json`. Commit those. Later, `/convention-override <rule-id> <reason>` records a disagreement and `/convention-health` shows how the rules are firing.
+
 ## Use with Codex
 
 Copy [`plugins/convention-core/codex/hooks.json`](plugins/convention-core/codex/hooks.json) to the repository's `.codex/hooks.json` and replace `__ORCHID_CORE__` with the path of a `convention-core` checkout or install. The layers are the same; the Codex output conventions are assumptions, listed in [`codex/README.md`](plugins/convention-core/codex/README.md).
@@ -47,4 +51,4 @@ CI runs all three on Linux with the oldest supported Python and on macOS with th
 
 ## Status
 
-Guard, lint and gate layers, the Codex adapter and the Swift pack are built and tested with simulated Claude Code and Codex payloads; the setup skill follows in a separate pull request. Nothing here has been exercised against a live Claude Code or Codex session yet.
+Guard, lint and gate layers, the scanner, the Codex adapter, setup and the Swift pack are built and tested with simulated Claude Code and Codex payloads. Nothing here has been exercised against a live Claude Code or Codex session yet.
