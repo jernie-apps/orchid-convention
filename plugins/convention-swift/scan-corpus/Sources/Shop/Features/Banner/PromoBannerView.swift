@@ -6,7 +6,7 @@ struct PromoBannerView: View {
     var body: some View {
         Text(title)
             .onAppear {
-                Task {
+                Task.detached {
                     let (data, _) = try await URLSession.shared.data(from: PromoBannerView.endpoint)
                     title = String(decoding: data, as: UTF8.self)
                 }

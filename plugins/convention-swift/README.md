@@ -7,15 +7,15 @@ Swift 6 and SwiftUI rule pack for Orchid Convention. It is data only: [`conventi
 | Id | Rule | Detected by | Repo can override |
 | --- | --- | --- | --- |
 | [`swift-naming-001`](rules/swift-naming-001.md) | Protocols take no I- prefix or -Protocol suffix | guard | yes |
-| [`swift-layering-001`](rules/swift-layering-001.md) | Domain/ never imports SwiftUI, UIKit, AppKit or WatchKit | guard | yes |
+| [`swift-layering-001`](rules/swift-layering-001.md) | Non-test files under `Domain/` import Foundation only | guard | yes |
 | [`swift-security-001`](rules/swift-security-001.md) | No hardcoded secret literals | guard | **no** |
 | [`swift-security-002`](rules/swift-security-002.md) | No personal-data field interpolated into a log call | guard | **no** |
 | [`swift-security-003`](rules/swift-security-003.md) | No personal data in logs, analytics or crash reports | scanner | **no** |
 | [`swift-structure-001`](rules/swift-structure-001.md) | No `*ViewModel` types: use a Store, a Draft or a `<Screen>Model` | guard | yes |
 | [`swift-structure-002`](rules/swift-structure-002.md) | `@Observable` only: no `ObservableObject`, `@Published`, `@StateObject`, `@ObservedObject`, `@EnvironmentObject` | guard | yes |
-| [`swift-structure-003`](rules/swift-structure-003.md) | One primary type per file, named like the file | scanner | yes |
+| [`swift-structure-003`](rules/swift-structure-003.md) | A file is named after what it holds; extra types only if they support the primary one | scanner | yes |
 | [`swift-layering-002`](rules/swift-layering-002.md) | `*View.swift` files never use `URLSession` or `URLRequest` | guard | yes |
-| [`swift-concurrency-001`](rules/swift-concurrency-001.md) | No unowned `Task { }` in a view; prefer `.task { }` (warn) | guard | yes |
+| [`swift-concurrency-001`](rules/swift-concurrency-001.md) | No `Task.detached` or `onAppear` Task in a view; load in `.task { }` (warn) | guard | yes |
 | [`swift-concurrency-002`](rules/swift-concurrency-002.md) | `@unchecked Sendable` carries a same-line `// SAFETY:` justification | guard | yes |
 | [`swift-style-001`](rules/swift-style-001.md) | No force unwrapping (SwiftLint `force_unwrapping`, warn) | lint | yes |
 

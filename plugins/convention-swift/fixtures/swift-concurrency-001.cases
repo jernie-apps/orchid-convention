@@ -1,39 +1,44 @@
-#> case good: lifetime-bound .task and a stored, cancelled Task
+#> case good: lifetime-bound .task, a button-action Task and a stored Task
 #> path: Sources/App/Features/Feed/FeedView.swift
 import SwiftUI
 
 struct FeedView: View {
-    @State private var viewModel = FeedViewModel()
+    @Environment(FeedStore.self) private var store
     @State private var refreshTask: Task<Void, Never>?
 
     var body: some View {
-        List(viewModel.items) { FeedRow(item: $0) }
-            .task { await viewModel.load() }
-            .refreshable { refreshTask = Task { await viewModel.refresh() } }
+        List(store.items) { FeedRow(item: $0) }
+            .task { await store.load() }
+            .toolbar {
+                Button(.feedReload) {
+                    Task { await store.reload() }
+                }
+            }
+            .refreshable { refreshTask = Task { await store.refresh() } }
+            .onAppear { refreshTask = Task { await store.refresh() } }
             .onDisappear { refreshTask?.cancel() }
     }
 }
 #> case good: Task outside a view file is not this rule's concern
 #> path: Sources/App/Services/SyncService.swift
 func scheduleSync() {
-    Task { await sync() }
+    Task.detached { await sync() }
 }
-#> case bad: fire-and-forget Task in a button (warn, does not block)
+#> case bad: loading from onAppear instead of .task (warn, does not block)
 #> path: Sources/App/Features/Feed/FeedView.swift
 #> expect: swift-concurrency-001
 struct FeedView: View {
     var body: some View {
-        Button("Reload") {
-            Task { await viewModel.load() }
-        }
+        List(store.items) { FeedRow(item: $0) }
+            .onAppear { Task { await store.load() } }
     }
 }
 #> case bad: detached Task with priority, as an edit
 #> path: Sources/App/Features/Feed/FeedView.swift
 #> tool: Edit
 #> expect: swift-concurrency-001
-        .onAppear {
+        Button(.feedPrefetch) {
             Task.detached(priority: .background) {
-                await viewModel.prefetch()
+                await store.prefetch()
             }
         }
