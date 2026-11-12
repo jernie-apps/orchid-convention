@@ -1,4 +1,5 @@
 rule	file	line	layer	required
+swift-structure-001	Sources/Shop/Features/Checkout/CheckoutViewModel.swift	6	sweep	yes
 swift-structure-002	Sources/Shop/Features/Checkout/CheckoutViewModel.swift	6	sweep	yes
 swift-style-001	Sources/Shop/Features/Checkout/CheckoutViewModel.swift	11	judged	yes
 swift-security-002	Sources/Shop/Features/Checkout/CheckoutViewModel.swift	13	sweep	yes
