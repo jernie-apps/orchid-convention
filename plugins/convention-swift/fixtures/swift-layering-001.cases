@@ -1,6 +1,8 @@
 #> case good: Domain uses Foundation only
 #> path: Sources/App/Domain/Order/OrderTotal.swift
 import Foundation
+import struct Foundation.Decimal
+// import SwiftUI
 
 struct OrderTotal: Equatable, Sendable {
     let amount: Decimal
@@ -14,6 +16,12 @@ struct OrderTotalView: View {
     let total: OrderTotal
     var body: some View { Text(total.amount, format: .currency(code: total.currency)) }
 }
+#> case good: Domain package tests import Testing and the module
+#> path: Packages/Domain/Tests/DomainTests/NotePolicyTests.swift
+@testable import Domain
+import Testing
+
+struct NotePolicyTests {}
 #> case bad: SwiftUI imported into Domain
 #> path: Sources/App/Domain/Order/OrderTotal.swift
 #> expect: swift-layering-001
@@ -30,3 +38,9 @@ struct OrderTotal {
 import struct SwiftUI.Color
 
 struct Customer {}
+#> case bad: persistence and observation in the Domain package, as an edit
+#> path: Packages/Domain/Sources/Domain/Notes/Note.swift
+#> tool: Edit
+#> expect: swift-layering-001
+import Observation
+import SwiftData

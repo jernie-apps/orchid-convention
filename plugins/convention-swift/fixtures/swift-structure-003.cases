@@ -9,7 +9,36 @@ final class OrderService {
 private enum Endpoint {
     static let orders = "/orders"
 }
-#> case bad: second public type in the file (scanner only)
+#> case good: an entity with its typed ID and input value
+#> path: Packages/Domain/Sources/Domain/Notes/Note.swift
+import Foundation
+
+public struct NoteID: Hashable, Sendable {
+    public let rawValue: UUID
+}
+
+public struct Note: Identifiable, Hashable, Sendable {
+    public let id: NoteID
+    public var title: String
+}
+
+public struct NoteInput: Hashable, Sendable {
+    public var title: String
+}
+#> case good: a repository protocol with its error and change types
+#> path: Packages/Domain/Sources/Domain/Notes/NoteRepository.swift
+public enum NoteRepositoryError: Error, Hashable {
+    case notFound
+}
+
+public enum NoteChange: Hashable, Sendable {
+    case saved(NoteID)
+}
+
+public protocol NoteRepository: Sendable {
+    func note(id: NoteID) async throws(NoteRepositoryError) -> Note
+}
+#> case bad: unrelated second type in the file (scanner only)
 #> path: Sources/App/Services/OrderService.swift
 #> expect: swift-structure-003
 final class OrderService {}

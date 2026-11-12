@@ -4,12 +4,12 @@
   "rules": [
     {
       "id": "swift-concurrency-001",
-      "pattern": "(^|[^A-Za-z0-9_.])Task(\\.detached)?[[:space:]]*(\\([^)]*\\))?[[:space:]]*\\{",
+      "pattern": "(^|[^A-Za-z0-9_.])Task\\.detached([^A-Za-z0-9_]|$)|\\.onAppear[^A-Za-z0-9_].*[^A-Za-z0-9_.]Task[[:space:]]*(\\([^)]*\\))?[[:space:]]*\\{",
       "file_glob": "**/*View.swift",
       "exclude_pattern": "^[[:space:]]*//|=[[:space:]]*Task",
       "severity": "warn",
       "overridable": true,
-      "message": "Unowned Task in a View: it is not cancelled when the view goes away. Prefer the .task { } modifier, or store the Task and cancel it in onDisappear."
+      "message": "Detached or onAppear Task in a View. Load in the .task { } modifier, which is cancelled with the view; use @concurrent on the callee for work that must leave the main actor. A short Task { await store.save() } inside a button action is fine."
     },
     {
       "id": "swift-concurrency-002",
@@ -22,11 +22,13 @@
     },
     {
       "id": "swift-layering-001",
-      "pattern": "^[[:space:]]*(@[A-Za-z_]+[[:space:]]+)*import[[:space:]]+((typealias|struct|class|enum|protocol|let|var|func)[[:space:]]+)?(SwiftUI|UIKit|AppKit|WatchKit)([^A-Za-z0-9_]|$)",
+      "pattern": "^[[:space:]]*(@[A-Za-z_]+[[:space:]]+)*import[[:space:]]+[A-Za-z_]",
       "file_glob": "**/Domain/**/*.swift",
+      "exclude_glob": "**/Tests/**",
+      "exclude_pattern": "^[[:space:]]*(@[A-Za-z_]+[[:space:]]+)*import[[:space:]]+((typealias|struct|class|enum|protocol|let|var|func)[[:space:]]+)?Foundation([^A-Za-z0-9_]|$)",
       "severity": "block",
       "overridable": true,
-      "message": "Files under Domain/ must not import SwiftUI, UIKit, AppKit or WatchKit. Move the UI-dependent code to the presentation layer."
+      "message": "Domain is pure: files under Domain/ may import Foundation and nothing else. Move UI code to a view, persistence and networking to the Data layer, and observable state to a Store."
     },
     {
       "id": "swift-layering-002",
