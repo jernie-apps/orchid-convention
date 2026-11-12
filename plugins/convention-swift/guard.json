@@ -37,7 +37,25 @@
       "exclude_pattern": "^[[:space:]]*//",
       "severity": "block",
       "overridable": true,
-      "message": "Views must not do networking. Move URLSession or URLRequest work to a service the ViewModel calls."
+      "message": "Views must not do networking. Move URLSession or URLRequest work to a repository implementation that the feature's Store calls."
+    },
+    {
+      "id": "swift-layering-003",
+      "pattern": "[Rr]epository",
+      "file_glob": "**/*View.swift",
+      "severity": "block",
+      "overridable": true,
+      "message": "Views call stores, not repositories. Move the call into the feature's Store and read the result from the Store. The word is matched in comments too."
+    },
+    {
+      "id": "swift-layering-004",
+      "pattern": "\\.shared([^A-Za-z0-9_]|$)",
+      "file_glob": "**/*.swift",
+      "exclude_glob": "**/AppDependencies.swift",
+      "exclude_pattern": "^[[:space:]]*//|swiftlint:disable:this[[:space:]]+no_shared_singleton",
+      "severity": "block",
+      "overridable": true,
+      "message": "No .shared outside the composition root. Create the dependency in AppDependencies.swift and pass it through an initializer or .environment. A justified Apple singleton needs a same-line // swiftlint:disable:this no_shared_singleton with the reason."
     },
     {
       "id": "swift-naming-001",

@@ -10,3 +10,4 @@ swift-structure-003	Sources/Shop/Services/ReceiptMailer.swift	12	judged	yes
 swift-layering-001	Sources/Shop/Domain/Pricing/PriceRule.swift	2	sweep	yes
 swift-concurrency-001	Sources/Shop/Features/Banner/PromoBannerView.swift	9	sweep	yes
 swift-layering-002	Sources/Shop/Features/Banner/PromoBannerView.swift	10	sweep	yes
+swift-layering-004	Sources/Shop/Features/Banner/PromoBannerView.swift	10	sweep	yes
