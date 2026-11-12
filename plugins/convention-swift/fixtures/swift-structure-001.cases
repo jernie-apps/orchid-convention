@@ -1,5 +1,26 @@
-#> case good: Observable final class, and a test struct named after it
+#> case good: a store, a draft, and a test struct named after a ViewModel
+#> path: Sources/App/Features/Notes/NotesStore.swift
+import Observation
+
+@MainActor
+@Observable
+final class NotesStore {
+    private(set) var notes: [Note] = []
+}
+
+struct NoteDraft {
+    var title = ""
+}
+
+struct LoginViewModelTests {}
+#> case good: a screen model that coordinates several stores
+#> path: Sources/App/Features/Dashboard/DashboardModel.swift
+// Coordinates NotesStore and TagsStore: the dashboard shows both in one list.
+@Observable
+final class DashboardModel {}
+#> case bad: Observable class ViewModel
 #> path: Sources/App/Features/Login/LoginViewModel.swift
+#> expect: swift-structure-001
 import Observation
 
 @MainActor
@@ -7,20 +28,20 @@ import Observation
 final class LoginViewModel {
     var email = ""
 }
-
-struct LoginViewModelTests {}
 #> case bad: struct ViewModel
 #> path: Sources/App/Features/Login/LoginViewModel.swift
 #> expect: swift-structure-001
-import Observation
-
 struct LoginViewModel {
     var email = ""
 }
-#> case bad: enum ViewModel as an edit
-#> path: Sources/App/Features/Settings/SettingsViewModel.swift
+#> case bad: generic base ViewModel as an edit
+#> path: Sources/App/Core/BaseViewModel.swift
 #> tool: Edit
 #> expect: swift-structure-001
-enum SettingsViewModel {
-    static let title = "Settings"
+class BaseViewModel<State> {
+    var state: State?
 }
+#> case bad: actor ViewModel
+#> path: Sources/App/Features/Sync/SyncViewModel.swift
+#> expect: swift-structure-001
+actor SyncViewModel {}

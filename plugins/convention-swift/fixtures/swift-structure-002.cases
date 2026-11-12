@@ -1,24 +1,40 @@
-#> case good: Observable ViewModel; a non-ViewModel store may stay ObservableObject
-#> path: Sources/App/Features/Cart/CartViewModel.swift
+#> case good: Observable store held with State and Environment
+#> path: Sources/App/Features/Cart/CartStore.swift
 import Observation
+import SwiftUI
 
 @MainActor
 @Observable
-final class CartViewModel {
-    var items: [CartItem] = []
+final class CartStore {
+    private(set) var items: [CartItem] = []
 }
 
-final class LegacyCartStore: ObservableObject {}
-#> case bad: ObservableObject ViewModel with Published
-#> path: Sources/App/Features/Cart/CartViewModel.swift
+struct CartScreen: View {
+    @State private var store = CartStore()
+    @Environment(Router.self) private var router
+    // was: @StateObject private var store = CartStore()
+    var body: some View { EmptyView() }
+}
+#> case bad: ObservableObject store with Published
+#> path: Sources/App/Features/Cart/CartStore.swift
 #> expect: swift-structure-002
 import Combine
 
 @MainActor
-final class CartViewModel: NSObject, ObservableObject {
+final class CartStore: NSObject, ObservableObject {
     @Published var items: [CartItem] = []
 }
 #> case bad: conformance added in an extension
-#> path: Sources/App/Features/Cart/CartViewModel+Observable.swift
+#> path: Sources/App/Features/Cart/CartStore+Observable.swift
 #> expect: swift-structure-002
-extension CartViewModel: ObservableObject {}
+extension CartStore: ObservableObject {}
+#> case bad: legacy property wrappers in a view, as an edit
+#> path: Sources/App/Features/Cart/CartScreen.swift
+#> tool: Edit
+#> expect: swift-structure-002
+    @StateObject private var store = CartStore()
+    @EnvironmentObject var session: Session
+#> case bad: ObservableObject ViewModel breaks both structure rules
+#> path: Sources/App/Features/Cart/CartViewModel.swift
+#> expect: swift-structure-001 swift-structure-002
+final class CartViewModel: ObservableObject {}

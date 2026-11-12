@@ -69,21 +69,21 @@
     },
     {
       "id": "swift-structure-001",
-      "pattern": "(^|[^A-Za-z0-9_])(struct|enum)[[:space:]]+[A-Za-z0-9_]*ViewModel([^A-Za-z0-9_]|$)",
+      "pattern": "(^|[^A-Za-z0-9_])(class|struct|actor|enum)[[:space:]]+[A-Za-z0-9_]*ViewModel([^A-Za-z0-9_]|$)",
       "file_glob": "**/*.swift",
       "exclude_pattern": "^[[:space:]]*//",
       "severity": "block",
       "overridable": true,
-      "message": "A ViewModel must be a class, not a struct or enum: a copied value type stops view updates silently. Use @Observable final class."
+      "message": "No ViewModel types. Put loaded data in a Store per aggregate (@Observable final class), form fields in a Draft struct in the view's @State, and rules in a Domain policy. A screen that coordinates several stores may have a <Screen>Model whose file starts with a comment saying why."
     },
     {
       "id": "swift-structure-002",
-      "pattern": "(^|[^A-Za-z0-9_])(class|extension)[[:space:]]+[A-Za-z0-9_]*ViewModel[^{]*:[^{]*ObservableObject([^A-Za-z0-9_]|$)",
+      "pattern": "(^|[^A-Za-z0-9_])ObservableObject([^A-Za-z0-9_]|$)|@(Published|StateObject|ObservedObject|EnvironmentObject)([^A-Za-z0-9_]|$)",
       "file_glob": "**/*.swift",
       "exclude_pattern": "^[[:space:]]*//",
       "severity": "block",
       "overridable": true,
-      "message": "ViewModels use @Observable, not ObservableObject. Replace the conformance with the @Observable macro and drop @Published."
+      "message": "Use @Observable, not ObservableObject. Drop @Published, and hold the object with @State (owner), @Environment (shared) or @Bindable (child) instead of @StateObject, @ObservedObject or @EnvironmentObject."
     }
   ]
 }

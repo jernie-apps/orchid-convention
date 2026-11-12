@@ -11,8 +11,8 @@ Swift 6 and SwiftUI rule pack for Orchid Convention. It is data only: [`conventi
 | [`swift-security-001`](rules/swift-security-001.md) | No hardcoded secret literals | guard | **no** |
 | [`swift-security-002`](rules/swift-security-002.md) | No personal-data field interpolated into a log call | guard | **no** |
 | [`swift-security-003`](rules/swift-security-003.md) | No personal data in logs, analytics or crash reports | scanner | **no** |
-| [`swift-structure-001`](rules/swift-structure-001.md) | A ViewModel is a class | guard | yes |
-| [`swift-structure-002`](rules/swift-structure-002.md) | A ViewModel is `@Observable`, not `ObservableObject` | guard | yes |
+| [`swift-structure-001`](rules/swift-structure-001.md) | No `*ViewModel` types: use a Store, a Draft or a `<Screen>Model` | guard | yes |
+| [`swift-structure-002`](rules/swift-structure-002.md) | `@Observable` only: no `ObservableObject`, `@Published`, `@StateObject`, `@ObservedObject`, `@EnvironmentObject` | guard | yes |
 | [`swift-structure-003`](rules/swift-structure-003.md) | One primary type per file, named like the file | scanner | yes |
 | [`swift-layering-002`](rules/swift-layering-002.md) | `*View.swift` files never use `URLSession` or `URLRequest` | guard | yes |
 | [`swift-concurrency-001`](rules/swift-concurrency-001.md) | No unowned `Task { }` in a view; prefer `.task { }` (warn) | guard | yes |
@@ -23,7 +23,7 @@ Swift 6 and SwiftUI rule pack for Orchid Convention. It is data only: [`conventi
 
 ## Scan corpus
 
-[`scan-corpus/`](scan-corpus) is the answer key for scanner runs: five files with nine required planted violations (six found by the regex sweep, three only by reading) and trap lines that must not be reported (an enum raw value, a commented-out key, a redacted email). CI checks the sweep half; the judged half is measured by hand with `score_findings.py` (see the core README).
+[`scan-corpus/`](scan-corpus) is the answer key for scanner runs: five files with ten required planted violations (seven found by the regex sweep, three only by reading) and trap lines that must not be reported (an enum raw value, a commented-out key, a redacted email). CI checks the sweep half; the judged half is measured by hand with `score_findings.py` (see the core README).
 
 ## Lint
 

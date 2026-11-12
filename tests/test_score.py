@@ -49,7 +49,7 @@ class ScoreTest(unittest.TestCase):
     def test_sweep_finds_every_planted_regex_violation_and_no_trap(self):
         out = run("sweep", CORPUS)
         self.assertEqual(out.returncode, 0, out.stdout + out.stderr)
-        self.assertIn("OK: sweep recall 6/6, 0 false positive(s)", out.stdout)
+        self.assertIn("OK: sweep recall 7/7, 0 false positive(s)", out.stdout)
 
     def test_sweep_fails_on_a_false_positive(self):
         copy = self.tmp / "convention-swift"
@@ -79,7 +79,7 @@ class ScoreTest(unittest.TestCase):
         out = run("score", CORPUS / "truth.tsv", perfect, missing, noisy)
         self.assertEqual(out.returncode, 1)
         self.assertIn("FALSE POSITIVE: swift-naming-001", out.stdout)
-        self.assertIn("found by every run: 6/9", out.stdout)
+        self.assertIn("found by every run: 7/10", out.stdout)
 
 
 if __name__ == "__main__":
