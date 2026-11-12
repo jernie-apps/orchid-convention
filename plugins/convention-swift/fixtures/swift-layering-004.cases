@@ -1,0 +1,34 @@
+#> case good: the composition root may use .shared
+#> path: App/AppDependencies.swift
+import Foundation
+
+struct AppDependencies {
+    let session = URLSession.shared
+}
+#> case good: injected dependency, a comment, and a justified same-line exception
+#> path: Sources/App/Services/LinkOpener.swift
+import UIKit
+
+struct LinkOpener {
+    let session: URLSession
+    // was: URLSession.shared
+    func open(_ url: URL) {
+        UIApplication.shared.open(url) // swiftlint:disable:this no_shared_singleton - system URL handler
+    }
+}
+#> case good: a property that merely starts with shared
+#> path: Sources/App/Features/Notes/NotesStore.swift
+let count = store.sharedNotes.count
+#> case bad: singleton in a service
+#> path: Sources/App/Services/OrderService.swift
+#> expect: swift-layering-004
+struct OrderService {
+    func fetch() async throws -> Data {
+        try await URLSession.shared.data(from: endpoint).0
+    }
+}
+#> case bad: custom singleton in a store, as an edit
+#> path: Sources/App/Features/Cart/CartStore.swift
+#> tool: Edit
+#> expect: swift-layering-004
+        AnalyticsClient.shared.track(.cartOpened)

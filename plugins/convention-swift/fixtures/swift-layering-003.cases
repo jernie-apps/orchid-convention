@@ -1,0 +1,38 @@
+#> case good: view reads its store
+#> path: Sources/App/Features/Notes/NoteList/NoteListView.swift
+import SwiftUI
+
+struct NoteListView: View {
+    @Environment(NotesStore.self) private var store
+
+    var body: some View {
+        List(store.notes) { NoteRow(note: $0) }
+            .task { await store.load() }
+    }
+}
+#> case good: a store may hold a repository
+#> path: Sources/App/Features/Notes/NotesStore.swift
+@Observable
+final class NotesStore {
+    private let repository: any NoteRepository
+    init(repository: any NoteRepository) { self.repository = repository }
+}
+#> case bad: view holds a repository
+#> path: Sources/App/Features/Notes/NoteList/NoteListView.swift
+#> expect: swift-layering-003
+import SwiftUI
+
+struct NoteListView: View {
+    let repository: any NoteRepository
+    @State private var notes: [Note] = []
+
+    var body: some View {
+        List(notes) { NoteRow(note: $0) }
+    }
+}
+#> case bad: repository named only in a comment, as an edit
+#> path: Sources/App/Features/Notes/NoteDetail/NoteDetailView.swift
+#> tool: Edit
+#> expect: swift-layering-003
+            // TODO: call noteRepository.delete(id) here
+            .task { await store.load() }

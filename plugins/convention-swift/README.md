@@ -15,6 +15,8 @@ Swift 6 and SwiftUI rule pack for Orchid Convention. It is data only: [`conventi
 | [`swift-structure-002`](rules/swift-structure-002.md) | `@Observable` only: no `ObservableObject`, `@Published`, `@StateObject`, `@ObservedObject`, `@EnvironmentObject` | guard | yes |
 | [`swift-structure-003`](rules/swift-structure-003.md) | A file is named after what it holds; extra types only if they support the primary one | scanner | yes |
 | [`swift-layering-002`](rules/swift-layering-002.md) | `*View.swift` files never use `URLSession` or `URLRequest` | guard | yes |
+| [`swift-layering-003`](rules/swift-layering-003.md) | `*View.swift` files never mention a repository; views call stores | guard | yes |
+| [`swift-layering-004`](rules/swift-layering-004.md) | `.shared` only in `AppDependencies.swift`, the composition root | guard | yes |
 | [`swift-concurrency-001`](rules/swift-concurrency-001.md) | No `Task.detached` or `onAppear` Task in a view; load in `.task { }` (warn) | guard | yes |
 | [`swift-concurrency-002`](rules/swift-concurrency-002.md) | `@unchecked Sendable` carries a same-line `// SAFETY:` justification | guard | yes |
 | [`swift-style-001`](rules/swift-style-001.md) | No force unwrapping (SwiftLint `force_unwrapping`, warn) | lint | yes |
@@ -23,7 +25,7 @@ Swift 6 and SwiftUI rule pack for Orchid Convention. It is data only: [`conventi
 
 ## Scan corpus
 
-[`scan-corpus/`](scan-corpus) is the answer key for scanner runs: five files with ten required planted violations (seven found by the regex sweep, three only by reading) and trap lines that must not be reported (an enum raw value, a commented-out key, a redacted email). CI checks the sweep half; the judged half is measured by hand with `score_findings.py` (see the core README).
+[`scan-corpus/`](scan-corpus) is the answer key for scanner runs: five files with eleven required planted violations (eight found by the regex sweep, three only by reading) and trap lines that must not be reported (an enum raw value, a commented-out key, a redacted email). CI checks the sweep half; the judged half is measured by hand with `score_findings.py` (see the core README).
 
 ## Lint
 

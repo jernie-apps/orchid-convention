@@ -1,26 +1,28 @@
-#> case good: view delegates loading to its ViewModel
+#> case good: view delegates loading to its store
 #> path: Sources/App/Features/Orders/OrderListView.swift
 import SwiftUI
 
 struct OrderListView: View {
-    @State private var viewModel = OrderListViewModel()
+    @Environment(OrdersStore.self) private var store
 
     var body: some View {
-        List(viewModel.orders) { OrderRow(order: $0) }
-            .task { await viewModel.load() }
+        List(store.orders) { OrderRow(order: $0) }
+            .task { await store.load() }
     }
 }
-#> case good: services may use URLSession
-#> path: Sources/App/Services/OrderService.swift
-struct OrderService {
+#> case good: a repository implementation may use an injected URLSession
+#> path: Packages/Data/Sources/Data/Orders/RemoteOrderRepository.swift
+struct RemoteOrderRepository {
+    let session: URLSession
+
     func fetch() async throws -> [Order] {
-        let (data, _) = try await URLSession.shared.data(from: endpoint)
+        let (data, _) = try await session.data(from: endpoint)
         return try JSONDecoder().decode([Order].self, from: data)
     }
 }
-#> case bad: view builds a request and fetches
+#> case bad: view builds a request and fetches through the shared session
 #> path: Sources/App/Features/Orders/OrderListView.swift
-#> expect: swift-layering-002
+#> expect: swift-layering-002 swift-layering-004
 import SwiftUI
 
 struct OrderListView: View {
