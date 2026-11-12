@@ -34,7 +34,7 @@ enum Credentials {
 }
 #> case bad: cascade, every guarded rule in one write, non-overridable first
 #> path: Sources/App/Domain/Login/LoginViewModel.swift
-#> expect: swift-security-001 swift-security-002 swift-layering-001 swift-naming-001 swift-structure-001 swift-security-003
+#> expect: swift-security-001 swift-security-002 swift-layering-001 swift-naming-001 swift-structure-001 swift-style-002 swift-security-003
 import SwiftUI
 
 protocol ILoginService {}

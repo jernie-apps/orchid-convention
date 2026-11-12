@@ -36,7 +36,7 @@ tags: [structure, swiftui, observation]
 
 This is the `no_observable_object` rule of the approved Swift template, checked before the write. It applies to every type, whatever its name: a store, a router or a session object is held the same way.
 
-Each of the five names is matched as a whole word, so `MyObservableObjectBridge` and a commented-out line do not match. A third-party type that still requires `ObservableObject` needs a file-level override with its reason.
+Each of the five names is matched as a whole word, so `MyObservableObjectBridge` and a commented-out line do not match. There is no per-file exemption: a repo that must keep a third-party `ObservableObject` type records a repo-wide override with its reason.
 
 ## Examples
 

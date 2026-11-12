@@ -1,5 +1,5 @@
-#> case good: stable id, redacted email, boolean flag
-#> path: Sources/App/Auth/SessionLogger.swift
+#> case good: stable id, redacted email, boolean flag, inside the logging wrapper
+#> path: Sources/App/Core/Logging/SessionLogger.swift
 import OSLog
 
 struct SessionLogger {
@@ -20,6 +20,6 @@ func signedIn(_ user: User) {
 #> case bad: phone number in print and public full name, as an edit
 #> path: Sources/App/Contacts/ContactCaller.swift
 #> tool: Edit
-#> expect: swift-security-002
+#> expect: swift-security-002 swift-style-002
         print("Calling \(contact.phoneNumber)")
         logger.error("Lookup failed for \(profile.fullName, privacy: .public)")

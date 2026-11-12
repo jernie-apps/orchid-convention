@@ -6,11 +6,11 @@ struct CheckoutTracker {
         logger.debug("Recipient set for order \(order.id)")
     }
 }
-#> case bad: concatenated name and street reach print (scanner only)
+#> case bad: concatenated name and street reach the log (scanner only)
 #> path: Sources/App/Shipping/ShippingNotifier.swift
 #> expect: swift-security-003
 func notify(_ order: Order) {
-    print("Shipping to " + order.recipient.name + ", " + order.recipient.street)
+    log.info("Shipping to " + order.recipient.name + ", " + order.recipient.street)
 }
 #> case bad: home address set as a crash-report key (scanner only)
 #> path: Sources/App/Diagnostics/CrashContext.swift

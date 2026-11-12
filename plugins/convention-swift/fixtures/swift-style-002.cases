@@ -1,0 +1,41 @@
+#> case good: logging through the wrapper
+#> path: Sources/App/Features/Notes/NotesStore.swift
+@Observable
+final class NotesStore {
+    private let log = Log(category: "notes")
+
+    func save(_ note: Note) async {
+        log.info("Saved note", sensitive: note.title)
+        // print("saved")
+        let plan = blueprint(for: note)
+    }
+}
+#> case good: the wrapper itself uses OSLog
+#> path: Core/Logging/Log.swift
+import OSLog
+
+struct Log {
+    private let logger: Logger
+    init(category: String) {
+        logger = Logger(subsystem: "app", category: category)
+    }
+}
+#> case bad: print in a store
+#> path: Sources/App/Features/Notes/NotesStore.swift
+#> expect: swift-style-002
+func save() async {
+    print("Saved note")
+}
+#> case bad: ad hoc Logger and OSLog import
+#> path: Sources/App/Services/SyncService.swift
+#> expect: swift-style-002
+import OSLog
+
+struct SyncService {
+    private let logger = Logger(subsystem: "app", category: "sync")
+}
+#> case bad: NSLog as an edit
+#> path: Sources/App/Services/SyncService.swift
+#> tool: Edit
+#> expect: swift-style-002
+        NSLog("Sync finished")

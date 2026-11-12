@@ -104,6 +104,16 @@
       "severity": "block",
       "overridable": true,
       "message": "Use @Observable, not ObservableObject. Drop @Published, and hold the object with @State (owner), @Environment (shared) or @Bindable (child) instead of @StateObject, @ObservedObject or @EnvironmentObject."
+    },
+    {
+      "id": "swift-style-002",
+      "pattern": "(^|[^A-Za-z0-9_.])(print|debugPrint|NSLog|os_log)[[:space:]]*\\(|(^|[^A-Za-z0-9_])Logger[[:space:]]*\\(|^[[:space:]]*import[[:space:]]+(os|OSLog)([^A-Za-z0-9_]|$)",
+      "file_glob": "**/*.swift",
+      "exclude_glob": "**/Logging/**",
+      "exclude_pattern": "^[[:space:]]*//",
+      "severity": "block",
+      "overridable": true,
+      "message": "Log through the Log wrapper (Core/Logging/Log.swift), not print, NSLog, os_log or an ad hoc Logger. Pass anything personal in sensitive:."
     }
   ]
 }

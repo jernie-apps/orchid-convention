@@ -122,8 +122,8 @@ class SetupTest(unittest.TestCase):
                        env=self.env)
         report = self.ok("health")
         swift = report["stacks"]["swift"]
-        self.assertEqual(swift["rules"], 14)
-        self.assertEqual(swift["layers"], {"guard": 11, "lint": 1, "scanner": 2, "sweep-only": 0})
+        self.assertEqual(swift["rules"], 15)
+        self.assertEqual(swift["layers"], {"guard": 12, "lint": 1, "scanner": 2, "sweep-only": 0})
         self.assertIn("swift-naming-001", swift["overrides"])
         self.assertEqual(swift["refused_overrides"], ["swift-security-001"])
         self.assertEqual(swift["guard_strikes"], {"swift-structure-001": 1})
