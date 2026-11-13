@@ -17,3 +17,5 @@ swift-layering-002	Sources/Shop/Features/Banner/PromoBannerView.swift	10	sweep	y
 swift-layering-004	Sources/Shop/Features/Banner/PromoBannerView.swift	10	sweep	yes
 swift-style-002	Sources/Shop/Support/PasswordPolicy.swift	2	sweep	yes
 swift-style-002	Sources/Shop/Support/PasswordPolicy.swift	13	sweep	yes
+swift-structure-004	Sources/Shop/Features/Checkout/CheckoutStore.swift	8	judged	yes
+swift-layering-005	Sources/Shop/Features/Checkout/CheckoutStore.swift	18	judged	yes
