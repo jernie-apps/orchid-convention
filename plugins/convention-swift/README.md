@@ -19,13 +19,14 @@ Swift 6 and SwiftUI rule pack for Orchid Convention. It is data only: [`conventi
 | [`swift-layering-004`](rules/swift-layering-004.md) | `.shared` only in `AppDependencies.swift`, the composition root | guard | yes |
 | [`swift-concurrency-001`](rules/swift-concurrency-001.md) | No `Task.detached` or `onAppear` Task in a view; load in `.task { }` (warn) | guard | yes |
 | [`swift-concurrency-002`](rules/swift-concurrency-002.md) | `@unchecked Sendable` carries a same-line `// SAFETY:` justification | guard | yes |
+| [`swift-style-002`](rules/swift-style-002.md) | Log through the `Log` wrapper: no `print`, `NSLog`, `os_log`, ad hoc `Logger` or `import OSLog` outside `Logging/` | guard | yes |
 | [`swift-style-001`](rules/swift-style-001.md) | No force unwrapping (SwiftLint `force_unwrapping`, warn) | lint | yes |
 
 "guard" rules are fragment-safe regexes, mirrored in `guard.json` and checked before every write. "lint" rules run through SwiftLint after the write. "scanner" rules need the whole file and are judged by the scan gate, which is not built yet; until then they are documented and fixture-covered but not enforced.
 
 ## Scan corpus
 
-[`scan-corpus/`](scan-corpus) is the answer key for scanner runs: five files with eleven required planted violations (eight found by the regex sweep, three only by reading) and trap lines that must not be reported (an enum raw value, a commented-out key, a redacted email). CI checks the sweep half; the judged half is measured by hand with `score_findings.py` (see the core README).
+[`scan-corpus/`](scan-corpus) is the answer key for scanner runs: five files with seventeen required planted violations (fourteen found by the regex sweep, three only by reading) and trap lines that must not be reported (an enum raw value, a commented-out key, a redacted email). CI checks the sweep half; the judged half is measured by hand with `score_findings.py` (see the core README).
 
 ## Lint
 
