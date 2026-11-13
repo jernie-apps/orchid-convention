@@ -1,0 +1,35 @@
+#> case good: a feature uses its own store, Domain and Core
+#> path: Sources/App/Features/Notes/NoteList/NoteListView.swift
+import SwiftUI
+
+struct NoteListView: View {
+    @Environment(NotesStore.self) private var store
+    @Environment(Router.self) private var router
+
+    var body: some View {
+        LoadPhaseView(phase: store.phase) {
+            List(store.notes) { NoteRow(note: $0) }
+        }
+        .task { await store.load() }
+    }
+}
+#> case bad: a view reads another feature's store (scanner only)
+#> path: Sources/App/Features/Notes/NoteList/NoteListView.swift
+#> expect: swift-layering-005
+import SwiftUI
+
+struct NoteListView: View {
+    @Environment(NotesStore.self) private var store
+    // SettingsStore is declared in Features/Settings/SettingsStore.swift
+    @Environment(SettingsStore.self) private var settings
+
+    var body: some View { List(store.notes) { NoteRow(note: $0) } }
+}
+#> case bad: a store pushes another feature's route (scanner only)
+#> path: Sources/App/Features/Notes/NotesStore.swift
+#> expect: swift-layering-005
+@Observable
+final class NotesStore {
+    // SettingsRoute is declared in Features/Settings/SettingsRoute.swift
+    func openProfile(on router: Router) { router.push(SettingsRoute.profile) }
+}

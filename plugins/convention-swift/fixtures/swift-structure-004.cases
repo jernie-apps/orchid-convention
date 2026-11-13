@@ -1,0 +1,33 @@
+#> case good: one aggregate with its phase and paging
+#> path: Sources/App/Features/Notes/NotesStore.swift
+import Observation
+
+@MainActor
+@Observable
+final class NotesStore {
+    private(set) var notes: [Note] = []
+    private(set) var phase: LoadPhase = .idle
+    private var cursor: PageCursor?
+    private let repository: any NoteRepository
+
+    init(repository: any NoteRepository) { self.repository = repository }
+}
+#> case bad: two aggregates and two repositories in one store (scanner only)
+#> path: Sources/App/Features/Notes/NotesStore.swift
+#> expect: swift-structure-004
+@Observable
+final class NotesStore {
+    private(set) var notes: [Note] = []
+    private(set) var tags: [Tag] = []
+    private let noteRepository: any NoteRepository
+    private let tagRepository: any TagRepository
+}
+#> case bad: form fields and an alert flag in a store (scanner only)
+#> path: Sources/App/Features/Notes/NotesStore.swift
+#> expect: swift-structure-004
+@Observable
+final class NotesStore {
+    private(set) var notes: [Note] = []
+    var draftTitle = ""
+    var isShowingDeleteAlert = false
+}

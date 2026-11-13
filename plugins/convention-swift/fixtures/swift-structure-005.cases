@@ -1,0 +1,34 @@
+#> case good: fields, validation and an input value
+#> path: Sources/App/Features/Notes/NoteForm/NoteDraft.swift
+struct NoteDraft {
+    var title = ""
+    var body = ""
+
+    init(note: Note? = nil) {
+        title = note?.title ?? ""
+        body = note?.body ?? ""
+    }
+
+    var input: NoteInput { NoteInput(title: title, body: body) }
+
+    func validate() throws(NoteValidationError) { try NotePolicy.validate(title: title) }
+}
+#> case bad: loaded list and a save call in a draft (scanner only)
+#> path: Sources/App/Features/Notes/NoteForm/NoteDraft.swift
+#> expect: swift-structure-005
+struct NoteDraft {
+    var title = ""
+    var allNotes: [Note] = []
+    let notes: any NoteRepository
+
+    func save() async throws { try await notes.save(NoteInput(title: title)) }
+}
+#> case bad: draft as an observable class holding a store (scanner only)
+#> path: Sources/App/Features/Notes/NoteForm/NoteDraft.swift
+#> expect: swift-structure-005
+@Observable
+final class NoteDraft {
+    var title = ""
+    let store: NotesStore
+    init(store: NotesStore) { self.store = store }
+}

@@ -79,7 +79,7 @@ class ScoreTest(unittest.TestCase):
         out = run("score", CORPUS / "truth.tsv", perfect, missing, noisy)
         self.assertEqual(out.returncode, 1)
         self.assertIn("FALSE POSITIVE: swift-naming-001", out.stdout)
-        self.assertIn("found by every run: 14/17", out.stdout)
+        self.assertIn("found by every run: 14/19", out.stdout)
 
 
 if __name__ == "__main__":
