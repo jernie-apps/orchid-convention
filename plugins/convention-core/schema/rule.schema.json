@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://github.com/companie-apps/orchid-convention/plugins/convention-core/schema/rule.schema.json",
+  "$id": "https://github.com/jernie-apps/orchid-convention/plugins/convention-core/schema/rule.schema.json",
   "title": "Orchid convention rule",
   "description": "Frontmatter of one rule file: plugins/convention-<stack>/rules/<id>.md. A rule id is permanent. Retire a rule by moving it to state 'removed'; never delete the file or reuse the id, because overrides, strikes, findings and fixtures all key on it. validate_rules.py implements the subset of draft-07 used here and fails on any keyword it does not implement.",
   "type": "object",

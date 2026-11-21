@@ -2,7 +2,7 @@
   "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
   "name": "orchid-convention",
   "owner": {
-    "name": "companie-apps"
+    "name": "jernie-apps"
   },
   "description": "Enforces a project's coding conventions while an agent writes code: a stack-agnostic core plus one rule pack per language.",
   "version": "0.1.0",
