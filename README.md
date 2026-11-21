@@ -20,7 +20,7 @@ A repo can switch off an overridable rule in writing at `.orchid/conventions/<st
 ## Install (Claude Code)
 
 ```
-/plugin marketplace add companie-apps/orchid-convention
+/plugin marketplace add jernie-apps/orchid-convention
 /plugin install convention-core@orchid-convention
 /plugin install convention-swift@orchid-convention
 ```
@@ -51,4 +51,12 @@ CI runs all three on Linux with the oldest supported Python and on macOS with th
 
 ## Status
 
-Guard, lint and gate layers, the scanner, the Codex adapter, setup and the Swift pack are built and tested with simulated Claude Code and Codex payloads. Nothing here has been exercised against a live Claude Code or Codex session yet.
+Built: the guard, lint and gate layers, the read-only scanner, the Codex adapter, the setup skill and the Swift pack (18 rules).
+
+Tested in CI on Linux and macOS: 85 behaviour tests, every rule's good and bad fixtures run through the real hook, and the Swift scan corpus, where the regex sweep must find every planted sweep violation and none of the trap lines. Hook tests use recorded Claude Code and Codex payloads.
+
+Next: Go, Kotlin and Dart packs.
+
+## License
+
+[MIT](LICENSE)
